@@ -1,0 +1,59 @@
+import "./style.css";
+
+const examples = [
+  {
+    href: "./examples/hello/",
+    title: "Hello",
+    blurb: "Nested tags, text captures, and a for-of list.",
+  },
+  {
+    href: "./examples/counter/",
+    title: "Counter",
+    blurb: "Plus and minus buttons that update a captured node.",
+  },
+  {
+    href: "./examples/todo/",
+    title: "Todo",
+    blurb: "Append items onto an existing list and remove them.",
+  },
+  {
+    href: "./examples/pojo/",
+    title: "POJO",
+    blurb: "Nested [object] blocks call add() on plain objects.",
+  },
+  {
+    href: "./examples/rxjs/",
+    title: "RxJS",
+    blurb: "Dialect builds the DOM; interval and fromEvent update it.",
+  },
+];
+
+const app = <main> {
+  .className = "wrap"
+  <p> {
+    .className = "kicker"
+    ["JSOX"]
+  }
+  <h1> { ["Shorthand for nested objects"] }
+  <p> {
+    .className = "lede"
+    ["JavaScript Object eXtensions: <tag> creates, [value] inserts, and construct blocks run with this bound to the target."]
+  }
+  <ul> {
+    .className = "grid"
+    for (const ex of examples) {
+      <li> {
+        <a> {
+          .className = "card"
+          .href = ex.href
+          <h2> { [ex.title] }
+          <p> { [ex.blurb] }
+        }
+      }
+    }
+  }
+}
+
+[document.body] {
+  [app]
+}

@@ -1,0 +1,94 @@
+import "./style.css";
+
+function node(kind, title) {
+  return {
+    kind,
+    title,
+    children: [],
+    add(...kids) {
+      this.children.push(...kids);
+    },
+  };
+}
+
+const handbook = node("book", "Compiler notes");
+
+[handbook] {
+  [node("leaf", "Why a dialect")]
+  const syntax = node("chapter", "Syntax")
+  [syntax] {
+    [node("leaf", "<tag> creates")]
+    [node("leaf", "[object] reuses")]
+    [node("leaf", "[value] inserts")]
+  }
+  const runtime = node("chapter", "Child insert")
+  [runtime] {
+    [node("leaf", "append on DOM nodes")]
+    [node("leaf", "push on arrays")]
+    [node("leaf", "add on these POJOs")]
+  }
+}
+
+const settings = {};
+[settings] {
+  .format = "pretty"
+  .indent = 2
+}
+
+function renderTree(n) {
+  return <li> {
+    .className = n.kind
+    <span> { [n.title] }
+    if (n.children.length) {
+      <ul> {
+        for (const child of n.children) {
+          [renderTree(child)]
+        }
+      }
+    }
+  }
+}
+
+const settingsView = <dl> {
+  .className = "settings"
+  for (const [key, value] of Object.entries(settings)) {
+    <div> {
+      <dt> { [key] }
+      <dd> { [String(value)] }
+    }
+  }
+}
+
+const app = <main> {
+  .className = "page"
+  <h1> { ["Plain objects"] }
+  <p> {
+    .className = "lede"
+    ["No document.createElement in the data. Nested [node] { } blocks call add() on the parent POJO. The same dialect then renders that tree to the DOM."]
+  }
+  <div> {
+    .className = "grid"
+    <section> {
+      <h2> { ["Tree"] }
+      <ul> {
+        .className = "tree"
+        [renderTree(handbook)]
+      }
+    }
+    <section> {
+      <h2> { ["JSON"] }
+      <pre> {
+        .className = "json"
+        [JSON.stringify(handbook, null, settings.indent)]
+      }
+    }
+    <section> {
+      <h2> { ["Property bag"] }
+      [settingsView]
+    }
+  }
+}
+
+[document.body] {
+  [app]
+}

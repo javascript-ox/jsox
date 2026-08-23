@@ -1,0 +1,39 @@
+{
+  "name": "jsox-vscode",
+  "displayName": "JSOX",
+  "description": "Syntax highlighting for .jsox (JSOX) files",
+  "version": "0.1.0",
+  "publisher": "jsox",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "jsox",
+        "aliases": [
+          "JSOX",
+          "jsox"
+        ],
+        "extensions": [
+          ".jsox"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jsox",
+        "scopeName": "source.jsox",
+        "path": "./syntaxes/jsox.tmLanguage.json",
+        "embeddedLanguages": {
+          "source.js": "javascript"
+        }
+      }
+    ]
+  }
+}

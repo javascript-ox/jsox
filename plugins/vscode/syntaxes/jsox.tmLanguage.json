@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "JSOX",
+  "scopeName": "source.jsox",
+  "patterns": [
+    { "include": "#tag" },
+    { "include": "#this-shorthand" },
+    { "include": "source.js" }
+  ],
+  "repository": {
+    "tag": {
+      "match": "<[A-Za-z][\\w-]*>",
+      "name": "entity.name.tag.jsox"
+    },
+    "this-shorthand": {
+      "match": "(?<=^|[\\{\\;])\\s*(\\.)([A-Za-z_$][\\w$]*)",
+      "captures": {
+        "1": { "name": "punctuation.accessor.jsox" },
+        "2": { "name": "variable.other.property.jsox" }
+      }
+    }
+  }
+}

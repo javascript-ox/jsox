@@ -1,0 +1,25 @@
+{
+  "name": "jsox-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "test": "npm test -w @jsox/compiler",
+    "example:hello": "npm run dev -w @jsox/hello",
+    "example:counter": "npm run dev -w @jsox/counter",
+    "example:todo": "npm run dev -w @jsox/todo",
+    "example:pojo": "npm run dev -w @jsox/pojo",
+    "example:rxjs": "npm run dev -w @jsox/rxjs",
+    "pages": "npm run dev -w @jsox/pages",
+    "build:examples": "npm run build -w @jsox/hello -w @jsox/counter -w @jsox/todo -w @jsox/pojo -w @jsox/rxjs",
+    "build:pages": "npm run build -w @jsox/pages",
+    "build:site": "npm run build:examples && npm run build:pages && node apps/pages/assemble.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

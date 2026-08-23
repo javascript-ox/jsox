@@ -1,0 +1,88 @@
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { splice, EL, SCOPE } from "../src/splice.js";
+
+describe("splice: <tag>", () => {
+  it("rewrites a bare tag", () => {
+    assert.equal(splice("<div>").trim(), `${EL}("div")`);
+  });
+
+  it("rewrites a tag with a block", () => {
+    const out = splice("<div> { }");
+    assert.match(out, new RegExp(`${EL}\\("div", function\\(\\)\\{`));
+  });
+
+  it("allows hyphenated custom elements", () => {
+    assert.equal(splice("<my-widget>").trim(), `${EL}("my-widget")`);
+  });
+
+  it("leaves comparisons alone", () => {
+    assert.equal(splice("a < b").trim(), "a < b");
+    assert.equal(splice("a < b && c > d").trim(), "a < b && c > d");
+  });
+
+  it("leaves array index alone", () => {
+    assert.equal(splice("arr[i]").trim(), "arr[i]");
+  });
+
+  it("nests tags", () => {
+    const out = splice("<div> { <p> { } }");
+    assert.match(out, new RegExp(`${EL}\\("div"`));
+    assert.match(out, new RegExp(`${EL}\\("p"`));
+  });
+});
+
+describe("splice: leading-dot", () => {
+  it("rewrites .ident at a primary start", () => {
+    const out = splice("<p> { .innerText = \"hello\" }");
+    assert.match(out, /this\.innerText = "hello"/);
+  });
+
+  it("does not rewrite member access", () => {
+    assert.equal(splice("foo.bar").trim(), "foo.bar");
+  });
+
+  it("leaves floats alone", () => {
+    assert.equal(splice("const x = .5").trim(), "const x = .5");
+    assert.equal(splice("const x = .0e1").trim(), "const x = .0e1");
+  });
+
+  it("rewrites chained methods after this-shorthand", () => {
+    const out = splice("<p> { .classList.add(\"on\") }");
+    assert.match(out, /this\.classList\.add\("on"\)/);
+  });
+
+  it("rewrites consecutive this-shorthands on new lines", () => {
+    const out = splice(`<p> {
+  .innerText = "hello"
+  .classList.add("on")
+}`);
+    assert.match(out, /this\.innerText = "hello"/);
+    assert.match(out, /this\.classList\.add\("on"\)/);
+    assert.equal(out.includes('this.innerText = "hello".classList'), false);
+  });
+});
+
+describe("splice: [expr] { }", () => {
+  it("rewrites a target-scope block", () => {
+    const out = splice("[myDiv] { .id = \"x\" }");
+    assert.match(out, new RegExp(`${SCOPE}\\(\\(myDiv\\), function\\(\\)\\{`));
+    assert.match(out, /this\.id = "x"/);
+  });
+
+  it("rewrites [document.body] { }", () => {
+    const out = splice("[document.body] { [box] }");
+    assert.match(out, new RegExp(`${SCOPE}\\(\\(document\\.body\\)`));
+    assert.match(out, /\[box\]/);
+  });
+
+  it("does not steal foo[bar] { }", () => {
+    const out = splice("foo[bar] { z }");
+    assert.equal(out.includes(SCOPE), false);
+    assert.match(out, /foo\[bar\]/);
+  });
+
+  it("leaves a top-level array literal alone", () => {
+    assert.equal(splice("const a = [x]").trim(), "const a = [x]");
+  });
+});

@@ -1,0 +1,46 @@
+import "./style.css";
+
+let count = 0;
+
+const valueEl = <span> {
+  .className = "count"
+  [String(count)]
+}
+
+function setCount(next) {
+  count = next;
+  valueEl.textContent = String(count);
+}
+
+const app = <main> {
+  .className = "counter"
+  <h1> { ["Counter"] }
+  <div> {
+    .className = "face"
+    <button> {
+      .type = "button"
+      .className = "btn"
+      .setAttribute("aria-label", "Decrease")
+      ["−"]
+      .onclick = () => setCount(count - 1)
+    }
+    [valueEl]
+    <button> {
+      .type = "button"
+      .className = "btn"
+      .setAttribute("aria-label", "Increase")
+      ["+"]
+      .onclick = () => setCount(count + 1)
+    }
+  }
+  <button> {
+    .type = "button"
+    .className = "reset"
+    ["Reset"]
+    .onclick = () => setCount(0)
+  }
+}
+
+[document.body] {
+  [app]
+}

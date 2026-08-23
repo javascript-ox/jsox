@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output (examples/*/dist, apps/pages/dist — regenerate with vite / build:site)
+dist/
+_site/
+
+# Logs and caches
+*.log
+npm-debug.log*
+.cache/
+.vite/
+
+# Environment and editor
+.env
+.env.*
+.idea/
+/.vscode/
+*.swp
+.DS_Store

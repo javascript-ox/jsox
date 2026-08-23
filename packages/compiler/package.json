@@ -1,0 +1,30 @@
+{
+  "name": "@jsox/compiler",
+  "version": "0.1.0",
+  "description": "JSOX — JavaScript Object eXtensions, a JS superset for nested object construction",
+  "type": "module",
+  "bin": {
+    "jsox": "./src/cli.js"
+  },
+  "exports": {
+    ".": "./src/compile.js",
+    "./vite": "./src/vite-plugin.js"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "astring": "^1.9.0",
+    "js-tokens": "^9.0.1",
+    "oxc-parser": "^0.95.0"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}

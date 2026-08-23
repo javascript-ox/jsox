@@ -1,0 +1,34 @@
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { compile } from "../src/compile.js";
+
+function exec(setup, source, ret) {
+  const { code } = compile(source);
+  return new Function(`${setup}\n${code}\nreturn (${ret});`)();
+}
+
+describe("non-dom", () => {
+  it("pushes onto arrays", () => {
+    const items = exec(`const items = [];`, `[items] { [1]; [2] }`, `items`);
+    assert.deepEqual(items, [1, 2]);
+  });
+
+  it("uses add() when present", () => {
+    const obj = exec(
+      `const obj = { values: [], add(v) { this.values.push(v); } };`,
+      `[obj] { ["a"] }`,
+      `obj`
+    );
+    assert.deepEqual(obj.values, ["a"]);
+  });
+
+  it("runs block methods and ignores children when no child method exists", () => {
+    const obj = exec(
+      `const obj = { n: 0, doThing() { this.n++; } };`,
+      `[obj] { .doThing(); [99] }`,
+      `obj`
+    );
+    assert.equal(obj.n, 1);
+    assert.equal(obj[0], undefined);
+  });
+});

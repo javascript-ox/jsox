@@ -1,0 +1,56 @@
+import "./style.css";
+
+const list = <ul> {
+  .className = "list"
+}
+
+const input = <input> {
+  .type = "text"
+  .placeholder = "Add a task"
+  .setAttribute("aria-label", "New task")
+}
+
+function addTask() {
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+
+  const item = <li> {
+    .className = "item"
+    <span> { [text] }
+    <button> {
+      .type = "button"
+      .className = "remove"
+      ["Remove"]
+      .onclick = () => item.remove()
+    }
+  }
+
+  [list] {
+    [item]
+  }
+}
+
+input.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") addTask();
+});
+
+const app = <main> {
+  .className = "todo"
+  <h1> { ["Tasks"] }
+  <div> {
+    .className = "row"
+    [input]
+    <button> {
+      .type = "button"
+      .className = "add"
+      ["Add"]
+      .onclick = addTask
+    }
+  }
+  [list]
+}
+
+[document.body] {
+  [app]
+}

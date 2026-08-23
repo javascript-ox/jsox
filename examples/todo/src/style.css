@@ -1,0 +1,106 @@
+:root {
+  color-scheme: light;
+  --paper: #eef3f0;
+  --card: #fbfdfc;
+  --ink: #16302a;
+  --muted: #5b726c;
+  --line: #d3e0db;
+  --accent: #0f766e;
+  --danger: #9f1239;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.todo {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.25rem;
+}
+
+h1 {
+  margin: 0 0 1.25rem;
+  font-size: 1.65rem;
+  letter-spacing: -0.03em;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  background: var(--card);
+  color: inherit;
+}
+
+input[type="text"]:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.add {
+  appearance: none;
+  border: 0;
+  border-radius: 0.65rem;
+  padding: 0 1rem;
+  background: var(--accent);
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  overflow: hidden;
+}
+
+.list:empty::after {
+  content: "Nothing here yet.";
+  display: block;
+  padding: 1rem 0.95rem;
+  color: var(--muted);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.95rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.remove {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

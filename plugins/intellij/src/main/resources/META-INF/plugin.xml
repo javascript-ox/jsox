@@ -1,0 +1,19 @@
+<idea-plugin>
+  <id>dev.jsox</id>
+  <name>JSOX</name>
+  <vendor>JSOX</vendor>
+  <description><![CDATA[
+    <p>JSOX (JavaScript Object eXtensions) for IntelliJ IDEA and WebStorm.</p>
+    <p><code>.jsox</code> files are JavaScript, with extra highlighting for
+    <code>&lt;tag&gt;</code> captures and leading <code>.prop</code> shorthand.</p>
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>JavaScript</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <fileTypeFactory implementation="dev.jsox.intellij.JsoxFileTypeFactory"/>
+    <annotator language="JavaScript" implementationClass="dev.jsox.intellij.JsoxAnnotator"/>
+    <highlightErrorFilter implementation="dev.jsox.intellij.JsoxHighlightErrorFilter"/>
+  </extensions>
+</idea-plugin>

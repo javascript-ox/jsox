@@ -1,0 +1,78 @@
+import "./style.css";
+import { fromEvent, interval, merge } from "rxjs";
+import { map, scan, startWith } from "rxjs";
+
+const clockEl = <time> {
+  .className = "clock is-live"
+  .dateTime = ""
+  ["--:--:--"]
+}
+
+const countEl = <span> {
+  .className = "count"
+  ["0"]
+}
+
+const minus = <button> {
+  .type = "button"
+  .className = "btn"
+  .setAttribute("aria-label", "Decrease")
+  ["−"]
+}
+
+const plus = <button> {
+  .type = "button"
+  .className = "btn"
+  .setAttribute("aria-label", "Increase")
+  ["+"]
+}
+
+interval(1000).pipe(
+  startWith(0),
+  map(() => new Date()),
+).subscribe((now) => {
+  clockEl.textContent = now.toLocaleTimeString();
+  clockEl.dateTime = now.toISOString();
+});
+
+merge(
+  fromEvent(minus, "click").pipe(map(() => -1)),
+  fromEvent(plus, "click").pipe(map(() => 1)),
+).pipe(
+  scan((total, delta) => total + delta, 0),
+  startWith(0),
+).subscribe((total) => {
+  countEl.textContent = String(total);
+});
+
+const app = <main> {
+  .className = "desk"
+  <h1> { ["Streams"] }
+  <p> {
+    .className = "lede"
+    ["Dialect builds the DOM. RxJS owns the updates — interval for the clock, fromEvent + scan for the counter."]
+  }
+  <section> {
+    .className = "card"
+    <h2> { ["interval"] }
+    [clockEl]
+  }
+  <section> {
+    .className = "card"
+    <h2> { ["fromEvent"] }
+    <div> {
+      .className = "face"
+      [minus]
+      [countEl]
+      [plus]
+    }
+    <p> {
+      .className = "hint"
+      ["Clicks are merged, scanned into a total, and written to the captured span."]
+    }
+  }
+}
+
+[document.body] {
+  [app]
+}
