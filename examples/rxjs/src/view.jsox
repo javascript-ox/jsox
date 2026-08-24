@@ -1,0 +1,90 @@
+import "@jsox/ui/theme.css";
+import { fromEvent, interval, merge } from "rxjs";
+import { map, scan, startWith } from "rxjs";
+
+export function Rxjs() {
+  const clockEl = <time> {
+    .className = "clock"
+    .dateTime = ""
+    ["--:--:--"]
+  }
+
+  const countEl = <span> {
+    .className = "count"
+    ["0"]
+  }
+
+  const minus = <button> {
+    .type = "button"
+    .className = "btn btn-round"
+    .setAttribute("aria-label", "Decrease")
+    ["−"]
+  }
+
+  const plus = <button> {
+    .type = "button"
+    .className = "btn btn-round"
+    .setAttribute("aria-label", "Increase")
+    ["+"]
+  }
+
+  const clockSub = interval(1000).pipe(
+    startWith(0),
+    map(() => new Date()),
+  ).subscribe((now) => {
+    clockEl.textContent = now.toLocaleTimeString();
+    clockEl.dateTime = now.toISOString();
+  });
+
+  const countSub = merge(
+    fromEvent(minus, "click").pipe(map(() => -1)),
+    fromEvent(plus, "click").pipe(map(() => 1)),
+  ).pipe(
+    scan((total, delta) => total + delta, 0),
+    startWith(0),
+  ).subscribe((total) => {
+    countEl.textContent = String(total);
+  });
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["RxJS"] }
+    <h1> { ["Streams"] }
+    <p> {
+      .className = "lede"
+      ["JSOX builds the DOM. RxJS owns the updates — interval for the clock, fromEvent + scan for the counter."]
+    }
+    <section> {
+      .className = "panel"
+      <h2> { ["interval"] }
+      [clockEl]
+    }
+    <section> {
+      .className = "panel"
+      <h2> { ["fromEvent"] }
+      <div> {
+        .className = "face"
+        [minus]
+        [countEl]
+        [plus]
+      }
+      <p> {
+        .className = "hint"
+        ["Clicks are merged, scanned into a total, and written to the captured span."]
+      }
+    }
+  }
+
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, obs) => {
+      if (root.isConnected) return;
+      clockSub.unsubscribe();
+      countSub.unsubscribe();
+      obs.disconnect();
+    }).observe(parent, { childList: true });
+  });
+
+  return root;
+}

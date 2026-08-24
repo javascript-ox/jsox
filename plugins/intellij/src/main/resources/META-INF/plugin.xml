@@ -4,16 +4,29 @@
   <vendor>JSOX</vendor>
   <description><![CDATA[
     <p>JSOX (JavaScript Object eXtensions) for IntelliJ IDEA and WebStorm.</p>
-    <p><code>.jsox</code> files are JavaScript, with extra highlighting for
-    <code>&lt;tag&gt;</code> captures and leading <code>.prop</code> shorthand.</p>
+    <p><code>.jsox</code> is its own file type (never JavaScript/JSX). Hover, completion,
+    and go to definition come from the bundled JSOX language server.</p>
   ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
-  <depends>JavaScript</depends>
+  <depends optional="true" config-file="lsp.xml">JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="dev.jsox.intellij.JsoxFileTypeFactory"/>
-    <annotator language="JavaScript" implementationClass="dev.jsox.intellij.JsoxAnnotator"/>
-    <highlightErrorFilter implementation="dev.jsox.intellij.JsoxHighlightErrorFilter"/>
+    <fileType
+        name="JSOX"
+        implementationClass="dev.jsox.intellij.JsoxFileType"
+        fieldName="INSTANCE"
+        language="JSOX"
+        extensions="jsox"/>
+    <fileTypeOverrider implementation="dev.jsox.intellij.JsoxFileTypeOverrider" order="last"/>
+    <lang.parserDefinition language="JSOX" implementationClass="dev.jsox.intellij.JsoxParserDefinition"/>
+    <lang.syntaxHighlighterFactory language="JSOX" implementationClass="dev.jsox.intellij.JsoxSyntaxHighlighterFactory"/>
+    <lang.commenter language="JSOX" implementationClass="dev.jsox.intellij.JsoxCommenter"/>
+    <notificationGroup id="JSOX" displayType="BALLOON"/>
+    <applicationConfigurable
+        parentId="language"
+        instance="dev.jsox.intellij.JsoxConfigurable"
+        id="dev.jsox.settings"
+        displayName="JSOX"/>
   </extensions>
 </idea-plugin>

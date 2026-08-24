@@ -1,8 +1,8 @@
 {
   "name": "jsox-vscode",
   "displayName": "JSOX",
-  "description": "Syntax highlighting for .jsox (JSOX) files",
-  "version": "0.1.0",
+  "description": "JSOX language support — highlighting, hover, complete, go to definition",
+  "version": "0.3.1",
   "publisher": "jsox",
   "private": true,
   "engines": {
@@ -11,7 +11,43 @@
   "categories": [
     "Programming Languages"
   ],
+  "activationEvents": [
+    "onLanguage:jsox"
+  ],
+  "main": "./extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "jsox.showOutput",
+        "title": "JSOX: Show Language Service Log"
+      }
+    ],
+    "configuration": {
+      "title": "JSOX",
+      "properties": {
+        "jsox.lsp.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the JSOX language server (packages/lsp/src/cli.js or the jsox-lsp binary). Empty searches the workspace."
+        },
+        "jsox.lsp.node": {
+          "type": "string",
+          "default": "",
+          "description": "Node binary used to launch the language server. Empty searches PATH / nvm."
+        }
+      }
+    },
+    "configurationDefaults": {
+      "[jsox]": {
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": true
+        },
+        "editor.suggestOnTriggerCharacters": true,
+        "editor.wordBasedSuggestions": "off"
+      }
+    },
     "languages": [
       {
         "id": "jsox",
@@ -29,11 +65,24 @@
       {
         "language": "jsox",
         "scopeName": "source.jsox",
-        "path": "./syntaxes/jsox.tmLanguage.json",
-        "embeddedLanguages": {
-          "source.js": "javascript"
-        }
+        "path": "./syntaxes/jsox.tmLanguage.json"
+      },
+      {
+        "scopeName": "source.jsox.injection",
+        "path": "./syntaxes/jsox.injection.tmLanguage.json",
+        "injectTo": ["source.jsox"]
       }
     ]
+  },
+  "scripts": {
+    "build": "esbuild ../../packages/lsp/src/features.js --bundle --platform=node --format=cjs --outfile=dist/session.js --external:typescript",
+    "package": "npm run build && vsce package --allow-missing-repository"
+  },
+  "dependencies": {
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.0",
+    "esbuild": "^0.25.8"
   }
 }

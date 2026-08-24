@@ -147,3 +147,31 @@ describe("compile: arrays vs captures", () => {
     assert.match(code, /foo\(\[x\]\)/);
   });
 });
+
+describe("compile: POJO trees", () => {
+  it("builds a nested object via add()", () => {
+    const { code } = compile(`
+function track(title) { return { title }; }
+const album = {
+  title: "",
+  year: 0,
+  tracks: [],
+  add(...items) { this.tracks.push(...items); }
+};
+[album] {
+  .title = "Night Bus"
+  .year = 2026
+  [track("Wire")]
+  [track("Salt")]
+}
+globalThis.__album = album;
+`);
+    const g = {};
+    new Function("globalThis", code)(g);
+    assert.equal(g.__album.constructor.name, "Object");
+    assert.equal(g.__album.title, "Night Bus");
+    assert.equal(g.__album.year, 2026);
+    assert.deepEqual(g.__album.tracks, [{ title: "Wire" }, { title: "Salt" }]);
+  });
+});
+

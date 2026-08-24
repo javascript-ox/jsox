@@ -8,6 +8,15 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "@jsox/counter": "*",
+    "@jsox/hello": "*",
+    "@jsox/pojo": "*",
+    "@jsox/rxjs": "*",
+    "@jsox/todo": "*",
+    "@jsox/ui": "*",
+    "navigo": "^8.11.1"
+  },
   "devDependencies": {
     "@jsox/compiler": "*",
     "vite": "^6.3.5"

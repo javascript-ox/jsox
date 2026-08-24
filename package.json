@@ -8,7 +8,8 @@
     "examples/*"
   ],
   "scripts": {
-    "test": "npm test -w @jsox/compiler",
+    "test": "npm test -w @jsox/compiler && npm test -w @jsox/lsp",
+    "lsp": "node packages/lsp/src/cli.js",
     "example:hello": "npm run dev -w @jsox/hello",
     "example:counter": "npm run dev -w @jsox/counter",
     "example:todo": "npm run dev -w @jsox/todo",

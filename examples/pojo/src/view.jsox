@@ -1,0 +1,118 @@
+import "@jsox/ui/theme.css";
+
+function track(title) {
+  return { title };
+}
+
+function makeAlbum() {
+  const album = {
+    title: "",
+    year: 0,
+    tracks: [],
+    add(...items) {
+      this.tracks.push(...items);
+    },
+  };
+
+  [album] {
+    .title = "Night Bus"
+    .year = 2026
+    [track("Wire")]
+    [track("Salt")]
+  }
+
+  return album;
+}
+
+export function Pojo() {
+  const album = makeAlbum();
+  const settings = {};
+  [settings] {
+    .format = "pretty"
+    .indent = 2
+  }
+
+  const jsonEl = <pre> {
+    .className = "code"
+  }
+
+  const factsEl = <div> {
+    .className = "facts"
+  }
+
+  function refresh() {
+    const data = {
+      title: album.title,
+      year: album.year,
+      tracks: album.tracks,
+    };
+    jsonEl.textContent = JSON.stringify(data, null, settings.indent);
+    factsEl.replaceChildren();
+    const lines = [
+      `constructor: ${album.constructor.name}`,
+      `instanceof Element: ${album instanceof Element}`,
+      `tracks.length: ${album.tracks.length}`,
+    ];
+    for (const line of lines) {
+      const row = <div> { [line] }
+      factsEl.append(row);
+    }
+  }
+
+  refresh();
+
+  const source = `[album] {
+  .title = "Night Bus"
+  .year = 2026
+  [track("Wire")]
+  [track("Salt")]
+}`;
+
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["POJO"] }
+    <h1> { ["Plain objects"] }
+    <p> {
+      .className = "lede"
+      ["album is not a DOM node. Nested [track()] calls album.add() because the object implements add(). The panel is JSON.stringify(album)."]
+    }
+    <div> {
+      .className = "stack"
+      <section> {
+        .className = "panel"
+        <h2> { ["JSOX that built it"] }
+        <pre> {
+          .className = "code"
+          [source]
+        }
+      }
+      <section> {
+        .className = "panel"
+        <h2> { ["Resulting object"] }
+        [factsEl]
+        [jsonEl]
+        <p> {
+          <button> {
+            .type = "button"
+            .className = "btn"
+            ["Add a track"]
+            .onclick = () => {
+              [album] {
+                [track("Track " + (album.tracks.length + 1))]
+              }
+              refresh();
+            }
+          }
+        }
+      }
+      <section> {
+        .className = "panel"
+        <h2> { ["Property bag"] }
+        <pre> {
+          .className = "code"
+          [JSON.stringify(settings, null, 2)]
+        }
+      }
+    }
+  }
+}

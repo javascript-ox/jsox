@@ -5,6 +5,11 @@ node_modules/
 dist/
 _site/
 
+# Packaged editor plugins
+*.vsix
+plugins/intellij/build/
+plugins/intellij/.gradle/
+
 # Logs and caches
 *.log
 npm-debug.log*
@@ -15,6 +20,8 @@ npm-debug.log*
 .env
 .env.*
 .idea/
-/.vscode/
+/.vscode/*
+!/.vscode/launch.json
+!/.vscode/tasks.json
 *.swp
 .DS_Store

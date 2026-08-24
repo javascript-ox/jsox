@@ -8,6 +8,7 @@
   },
   "exports": {
     ".": "./src/compile.js",
+    "./splice": "./src/splice.js",
     "./vite": "./src/vite-plugin.js"
   },
   "files": [

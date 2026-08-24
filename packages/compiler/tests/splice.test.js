@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { splice, EL, SCOPE } from "../src/splice.js";
+import { splice, spliceWithMap, origToGen, genToOrig, EL, SCOPE } from "../src/splice.js";
 
 describe("splice: <tag>", () => {
   it("rewrites a bare tag", () => {
@@ -84,5 +84,27 @@ describe("splice: [expr] { }", () => {
 
   it("leaves a top-level array literal alone", () => {
     assert.equal(splice("const a = [x]").trim(), "const a = [x]");
+  });
+});
+
+describe("spliceWithMap", () => {
+  it("maps this-shorthand back to the original dot", () => {
+    const src = "<p> { .innerText = \"hi\" }";
+    const { code, maps } = spliceWithMap(src);
+    const genDot = origToGen(maps, src.indexOf(".innerText"));
+    assert.equal(code[genDot], ".");
+    assert.equal(code.slice(genDot - 4, genDot + 10), "this.innerText");
+    assert.equal(src[genToOrig(maps, genDot)], ".");
+  });
+
+  it("keeps splice() and spliceWithMap().code equal", () => {
+    const src = "<div> { .className = \"x\"; [child] }";
+    assert.equal(spliceWithMap(src).code, splice(src));
+  });
+
+  it("does not rewrite a lone dot unless incompleteThis is set", () => {
+    const src = "<button> {\n  .\n}";
+    assert.equal(spliceWithMap(src).code.includes("this."), false);
+    assert.equal(spliceWithMap(src, { incompleteThis: true }).code.includes("this."), true);
   });
 });

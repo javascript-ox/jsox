@@ -1,0 +1,59 @@
+import "@jsox/ui/theme.css";
+
+export function Todo() {
+  const list = <ul> {
+    .className = "list panel"
+  }
+
+  const input = <input> {
+    .type = "text"
+    .placeholder = "Add a task"
+    .setAttribute("aria-label", "New task")
+  }
+
+  function addTask() {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+
+    const item = <li> {
+      .className = "item"
+      <span> { [text] }
+      <button> {
+        .type = "button"
+        .className = "btn btn-ghost"
+        ["Remove"]
+        .onclick = () => item.remove()
+      }
+    }
+
+    [list] {
+      [item]
+    }
+  }
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") addTask();
+  });
+
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Todo"] }
+    <h1> { ["Tasks"] }
+    <p> {
+      .className = "lede"
+      ["New items are constructed as <li> and inserted onto the existing list with [list] { [item] }."]
+    }
+    <div> {
+      .className = "row"
+      [input]
+      <button> {
+        .type = "button"
+        .className = "btn btn-accent"
+        ["Add"]
+        .onclick = addTask
+      }
+    }
+    [list]
+  }
+}

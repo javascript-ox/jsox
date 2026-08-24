@@ -2,7 +2,7 @@ import { splice, EL, SCOPE } from "./splice.js";
 import { lower } from "./lower.js";
 import { normalizeConfig } from "./config.js";
 
-export { splice, EL, SCOPE } from "./splice.js";
+export { splice, spliceWithMap, origToGen, genToOrig, EL, SCOPE } from "./splice.js";
 export { normalizeConfig, defaultConfig, loadConfig } from "./config.js";
 
 /**

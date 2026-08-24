@@ -1,24 +1,5 @@
-import "./style.css";
-
-const app = <div> {
-  .className = "app"
-  <h1> {
-    ["JSOX"]
-  }
-  <p> {
-    ["Hello world. Nested captures build a tree — "]
-    <strong> {
-      ["no JSX closing tags"]
-    }
-    ["."]
-  }
-  <ul> {
-    for (const item of ["create with <tag>", "reuse with [object]", "insert with [value]"]) {
-      <li> { [item] }
-    }
-  }
-}
+import { Hello } from "./view.jsox";
 
 [document.body] {
-  [app]
+  [Hello()]
 }

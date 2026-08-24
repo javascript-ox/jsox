@@ -1,0 +1,21 @@
+import "@jsox/ui/theme.css";
+
+export function Hello() {
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Hello"] }
+    <h1> { ["JSOX"] }
+    <p> {
+      .className = "lede"
+      ["Nested captures build a tree — "]
+      <strong> { ["no JSX closing tags"] }
+      ["."]
+    }
+    <ul> {
+      .className = "plain-list"
+      for (const item of ["create with <tag>", "reuse with [object]", "insert with [value]"]) {
+        <li> { [item] }
+      }
+    }
+  }
+}

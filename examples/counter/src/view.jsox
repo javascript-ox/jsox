@@ -1,0 +1,51 @@
+import "@jsox/ui/theme.css";
+
+export function Counter() {
+  let count = 0;
+
+  const valueEl = <span> {
+    .className = "count"
+    [String(count)]
+  }
+
+  function setCount(next) {
+    count = next;
+    valueEl.textContent = String(count);
+  }
+
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Counter"] }
+    <h1> { ["Plus and minus"] }
+    <p> {
+      .className = "lede"
+      ["The number is a captured node. Click handlers write textContent."]
+    }
+    <div> {
+      .className = "face"
+      <button> {
+        .type = "button"
+        .className = "btn btn-round"
+        .setAttribute("aria-label", "Decrease")
+        ["−"]
+        .onclick = () => setCount(count - 1)
+      }
+      [valueEl]
+      <button> {
+        .type = "button"
+        .className = "btn btn-round"
+        .setAttribute("aria-label", "Increase")
+        ["+"]
+        .onclick = () => setCount(count + 1)
+      }
+    }
+    <p> {
+      <button> {
+        .type = "button"
+        .className = "btn btn-ghost"
+        ["Reset"]
+        .onclick = () => setCount(0)
+      }
+    }
+  }
+}

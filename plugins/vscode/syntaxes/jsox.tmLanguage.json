@@ -3,21 +3,80 @@
   "name": "JSOX",
   "scopeName": "source.jsox",
   "patterns": [
-    { "include": "#tag" },
-    { "include": "#this-shorthand" },
-    { "include": "source.js" }
+    { "include": "#jsox" },
+    { "include": "source.ts" }
   ],
   "repository": {
-    "tag": {
-      "match": "<[A-Za-z][\\w-]*>",
-      "name": "entity.name.tag.jsox"
+    "jsox": {
+      "patterns": [
+        { "include": "#tag-block" },
+        { "include": "#scope-block" },
+        { "include": "#tag-bare" },
+        { "include": "#this-shorthand" }
+      ]
+    },
+    "tag-block": {
+      "name": "meta.block.tag.jsox",
+      "begin": "(?<![\\w$.])(<)([A-Za-z][\\w-]*)(>)\\s*(\\{)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.jsox" },
+        "2": { "name": "entity.name.tag.jsox" },
+        "3": { "name": "punctuation.definition.tag.end.jsox" },
+        "4": { "name": "punctuation.section.block.begin.jsox" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.block.end.jsox" }
+      },
+      "patterns": [{ "include": "#block-body" }]
+    },
+    "tag-bare": {
+      "match": "(?<![\\w$.])(<)([A-Za-z][\\w-]*)(>)",
+      "captures": {
+        "1": { "name": "punctuation.definition.tag.begin.jsox" },
+        "2": { "name": "entity.name.tag.jsox" },
+        "3": { "name": "punctuation.definition.tag.end.jsox" }
+      }
+    },
+    "scope-block": {
+      "name": "meta.block.scope.jsox",
+      "begin": "(\\[[^\\[\\]\\n]*\\])\\s*(\\{)",
+      "beginCaptures": {
+        "1": { "name": "meta.scope.jsox" },
+        "2": { "name": "punctuation.section.block.begin.jsox" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.block.end.jsox" }
+      },
+      "patterns": [{ "include": "#block-body" }]
+    },
+    "capture": {
+      "match": "\\[[^\\[\\]\\n]*\\]",
+      "name": "meta.capture.jsox"
     },
     "this-shorthand": {
-      "match": "(?<=^|[\\{\\;])\\s*(\\.)([A-Za-z_$][\\w$]*)",
+      "match": "(?:^|(?<=[{\\;]))\\s*(\\.)([A-Za-z_$][\\w$]*)",
       "captures": {
-        "1": { "name": "punctuation.accessor.jsox" },
+        "1": { "name": "keyword.operator.this-shorthand.jsox" },
         "2": { "name": "variable.other.property.jsox" }
       }
+    },
+    "nested-braces": {
+      "begin": "\\{",
+      "end": "\\}",
+      "patterns": [{ "include": "#block-body" }]
+    },
+    "block-body": {
+      "patterns": [
+        { "include": "#tag-block" },
+        { "include": "#scope-block" },
+        { "include": "#tag-bare" },
+        { "include": "#this-shorthand" },
+        { "include": "#capture" },
+        { "include": "#nested-braces" },
+        { "include": "source.ts" }
+      ]
     }
   }
 }

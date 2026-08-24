@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "JSOX: VS Code Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/plugins/vscode",
+        "${workspaceFolder}"
+      ],
+      "preLaunchTask": "build-jsox-vscode"
+    }
+  ]
+}
