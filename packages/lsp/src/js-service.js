@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { spliceWithMap, origToGen, genToOrig } from "@jsox/compiler/splice";
+import { spliceWithMap, origToGen, genToOrig } from "@js-ox/compiler/splice";
 import { PREAMBLE } from "./preamble.js";
 
 function toVirtual(source) {

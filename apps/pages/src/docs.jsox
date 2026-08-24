@@ -1,0 +1,200 @@
+const github = "https://github.com/javascript-ox/jsox";
+
+const startInstall = `npm install -D @js-ox/compiler`;
+
+const startVite = `import { defineConfig } from "vite";
+import jsox from "@js-ox/compiler/vite";
+
+export default defineConfig({
+  plugins: [jsox()],
+});`;
+
+const startFile = `export function Hello() {
+  return <h1> {
+    ["Hello, JSOX"]
+  }
+}
+
+[document.body] {
+  [Hello()]
+}`;
+
+const startCli = `npx jsox compile src/main.jsox -o dist/main.js`;
+
+const tutTag = `const box = <div>
+const button = <button>`;
+
+const tutBlock = `const button = <button> {
+  .type = "button"
+  .className = "btn"
+}`;
+
+const tutCapture = `const label = <span> {
+  ["Save"]
+}`;
+
+const tutNest = `const card = <article> {
+  .className = "card"
+  <h2> { ["Title"] }
+  <p> { ["A nested construct is just more construction."] }
+}`;
+
+const tutBind = `const heading = <h1> { ["Counter"] }
+
+export function view() {
+  return <main> {
+    [heading]
+    <button> {
+      .onclick = () => {
+        heading.textContent = "Clicked"
+      }
+      ["Click"]
+    }
+  }
+}`;
+
+const tutScope = `const settings = {}
+
+[settings] {
+  .format = "pretty"
+  .indent = 2
+}`;
+
+const tutPojo = `const album = {
+  tracks: [],
+  add(...items) {
+    this.tracks.push(...items);
+  },
+}
+
+[album] {
+  .title = "Night Bus"
+  [track("Wire")]
+}`;
+
+function DocPage({ kicker, title, lede, children, nextHref, nextLabel, prevHref, prevLabel }) {
+  return <main> {
+    .className = "wrap doc"
+    <p> { .className = "kicker"; [kicker] }
+    <h1> { [title] }
+    <p> { .className = "lede"; [lede] }
+    [children]
+    <nav> {
+      .className = "doc-nav"
+      if (prevHref) {
+        <a> { .href = prevHref; [prevLabel] }
+      }
+      if (nextHref) {
+        <a> { .href = nextHref; [nextLabel] }
+      }
+    }
+  }
+}
+
+export function QuickStart() {
+  return DocPage({
+    kicker: "Quick Start",
+    title: "From zero to a constructed object.",
+    lede: "JSOX is a compile-time dialect. Install the compiler from npm, name a file .jsox, and construct in place. There is no runtime package.",
+    nextHref: "#/tutorial",
+    nextLabel: "Basic tutorial →",
+    children: <div> {
+      <h2> { ["1. Install the compiler"] }
+      <p> {
+        ["Node 20 or later. Add @js-ox/compiler as a dev dependency. It ships the Vite plugin and the jsox CLI."]
+      }
+      <pre> { .className = "code"; [startInstall] }
+
+      <h2> { ["2. Hook up Vite"] }
+      <p> {
+        ["Register the plugin. After that, import .jsox files the same way you import .js."]
+      }
+      <pre> { .className = "code"; [startVite] }
+
+      <h2> { ["3. Write a file"] }
+      <p> {
+        ["Name it .jsox. A tag constructs an object. A block runs with this bound to it. Brackets compose another value in. There is no closing tag."]
+      }
+      <pre> { .className = "code"; [startFile] }
+
+      <h2> { ["4. Or compile on the command line"] }
+      <p> {
+        ["Without Vite, the CLI writes plain JavaScript to stdout or -o."]
+      }
+      <pre> { .className = "code"; [startCli] }
+
+      <p> {
+        ["From there, the "]
+        <a> { .href = "#/tutorial"; ["basic tutorial"] }
+        [" walks through construction in order: create, configure, compose, then the same form on plain objects."]
+      }
+    },
+  });
+}
+
+export function Tutorial() {
+  return DocPage({
+    kicker: "Basic Tutorial",
+    title: "Object construction, one mark at a time.",
+    lede: "JSOX is still JavaScript: imports, functions, and loops work as usual. The dialect only changes how you construct an object.",
+    prevHref: "#/start",
+    prevLabel: "← Quick start",
+    nextHref: "#/",
+    nextLabel: "Back to overview →",
+    children: <div> {
+      <h2> { ["Create with a tag"] }
+      <p> {
+        ["A tag constructs a value. For HTML names that means document.createElement. The construct is an expression — you can assign it, return it, or nest it."]
+      }
+      <pre> { .className = "code"; [tutTag] }
+
+      <h2> { ["Configure with a block"] }
+      <p> {
+        ["A block after the tag is the constructor body. Inside it, this is the object under construction. A leading .prop is this.prop."]
+      }
+      <pre> { .className = "code"; [tutBlock] }
+
+      <h2> { ["Compose with brackets"] }
+      <p> {
+        ["[value] adds a part to the object being built. A string becomes text content on an element. A node or the result of a call is inserted with append, push, or add — whichever the target implements."]
+      }
+      <pre> { .className = "code"; [tutCapture] }
+
+      <h2> { ["Nest construction"] }
+      <p> {
+        ["A tag inside a block constructs a nested object and composes it immediately. You do not close tags. You just keep constructing."]
+      }
+      <pre> { .className = "code"; [tutNest] }
+
+      <h2> { ["Keep the reference"] }
+      <p> {
+        ["The construct is an expression, so capture it. Later updates are ordinary JavaScript on that object — no render function required."]
+      }
+      <pre> { .className = "code"; [tutBind] }
+
+      <h2> { ["The same form on any object"] }
+      <p> {
+        ["[target] { ... } runs a construct block against an existing value. this is that value. This is how you construct into document.body, or into a plain object."]
+      }
+      <pre> { .className = "code"; [tutScope] }
+
+      <h2> { ["Plain objects"] }
+      <p> {
+        ["If the object implements add(), nested constructs call it. Arrays can push. The DOM is one target, not a separate language."]
+      }
+      <pre> { .className = "code"; [tutPojo] }
+
+      <p> {
+        ["When you want to see this running, the overview has five small apps — including a POJO album and an RxJS clock."]
+      }
+      <p> {
+        <a> {
+          .href = github
+          .target = "_blank"
+          .rel = "noreferrer"
+          ["Source on GitHub"]
+        }
+      }
+    },
+  });
+}

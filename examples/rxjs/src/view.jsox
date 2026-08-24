@@ -1,4 +1,4 @@
-import "@jsox/ui/theme.css";
+import "@js-ox/ui/theme.css";
 import { fromEvent, interval, merge } from "rxjs";
 import { map, scan, startWith } from "rxjs";
 

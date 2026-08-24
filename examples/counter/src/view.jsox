@@ -1,4 +1,4 @@
-import "@jsox/ui/theme.css";
+import "@js-ox/ui/theme.css";
 
 export function Counter() {
   let count = 0;

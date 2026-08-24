@@ -1,5 +1,5 @@
 {
-  "name": "@jsox/pages",
+  "name": "@js-ox/pages",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,16 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@jsox/counter": "*",
-    "@jsox/hello": "*",
-    "@jsox/pojo": "*",
-    "@jsox/rxjs": "*",
-    "@jsox/todo": "*",
-    "@jsox/ui": "*",
+    "@js-ox/counter": "*",
+    "@js-ox/hello": "*",
+    "@js-ox/pojo": "*",
+    "@js-ox/rxjs": "*",
+    "@js-ox/todo": "*",
+    "@js-ox/ui": "*",
     "navigo": "^8.11.1"
   },
   "devDependencies": {
-    "@jsox/compiler": "*",
+    "@js-ox/compiler": "*",
     "vite": "^6.3.5"
   }
 }

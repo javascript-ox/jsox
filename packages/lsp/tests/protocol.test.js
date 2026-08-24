@@ -103,7 +103,7 @@ describe("jsox-lsp protocol", () => {
         capabilities: {},
         clientInfo: { name: "jsox-lsp-test" },
       });
-      assert.equal(init.serverInfo?.name, "jsox-lsp");
+      assert.equal(init.serverInfo?.name, "JSOX");
       assert.equal(init.capabilities.hoverProvider, true);
       assert.equal(init.capabilities.completionProvider.triggerCharacters.includes("."), true);
       server.notify("initialized", {});

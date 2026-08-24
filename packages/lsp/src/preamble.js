@@ -1,4 +1,4 @@
-import { EL, SCOPE } from "@jsox/compiler/splice";
+import { EL, SCOPE } from "@js-ox/compiler/splice";
 
 /** Stubs so TypeScript can type <tag> blocks and [el] scopes as DOM. */
 export const PREAMBLE = `/**

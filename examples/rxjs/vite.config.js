@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import jsox from "@jsox/compiler/vite";
+import jsox from "@js-ox/compiler/vite";
 
 export default defineConfig({
   plugins: [jsox()],

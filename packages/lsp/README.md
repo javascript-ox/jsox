@@ -1,4 +1,4 @@
-# @jsox/lsp
+# @js-ox/lsp
 
 Language server for `.jsox` files.
 

@@ -1,5 +1,5 @@
 {
-  "name": "@jsox/hello",
+  "name": "@js-ox/hello",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -12,10 +12,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@jsox/ui": "*"
+    "@js-ox/ui": "*"
   },
   "devDependencies": {
-    "@jsox/compiler": "*",
+    "@js-ox/compiler": "*",
     "vite": "^6.3.5"
   }
 }

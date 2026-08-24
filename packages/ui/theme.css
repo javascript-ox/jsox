@@ -612,6 +612,55 @@ pre.code {
   text-decoration: underline;
 }
 
+.doc {
+  max-width: 44rem;
+}
+
+.doc h2 {
+  margin: 2.2rem 0 0.55rem;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  color: inherit;
+}
+
+.doc p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.doc a {
+  color: var(--accent);
+}
+
+.doc pre.code {
+  margin: 0 0 1.35rem;
+  padding: 1rem 1.05rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+}
+
+.doc-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 2.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+
+.doc-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.doc-nav a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 800px) {
   .boasts,
   .pillars,

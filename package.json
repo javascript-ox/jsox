@@ -8,17 +8,19 @@
     "examples/*"
   ],
   "scripts": {
-    "test": "npm test -w @jsox/compiler && npm test -w @jsox/lsp",
+    "test": "npm test -w @js-ox/compiler && npm test -w @js-ox/lsp",
     "lsp": "node packages/lsp/src/cli.js",
-    "example:hello": "npm run dev -w @jsox/hello",
-    "example:counter": "npm run dev -w @jsox/counter",
-    "example:todo": "npm run dev -w @jsox/todo",
-    "example:pojo": "npm run dev -w @jsox/pojo",
-    "example:rxjs": "npm run dev -w @jsox/rxjs",
-    "pages": "npm run dev -w @jsox/pages",
-    "build:examples": "npm run build -w @jsox/hello -w @jsox/counter -w @jsox/todo -w @jsox/pojo -w @jsox/rxjs",
-    "build:pages": "npm run build -w @jsox/pages",
-    "build:site": "npm run build:examples && npm run build:pages && node apps/pages/assemble.js"
+    "example:hello": "npm run dev -w @js-ox/hello",
+    "example:counter": "npm run dev -w @js-ox/counter",
+    "example:todo": "npm run dev -w @js-ox/todo",
+    "example:pojo": "npm run dev -w @js-ox/pojo",
+    "example:rxjs": "npm run dev -w @js-ox/rxjs",
+    "pages": "npm run dev -w @js-ox/pages",
+    "build:examples": "npm run build -w @js-ox/hello -w @js-ox/counter -w @js-ox/todo -w @js-ox/pojo -w @js-ox/rxjs",
+    "build:pages": "npm run build -w @js-ox/pages",
+    "build:site": "npm run build:examples && npm run build:pages && node apps/pages/assemble.js",
+    "publish:compiler": "npm publish -w @js-ox/compiler --access public",
+    "publish:lsp": "npm publish -w @js-ox/lsp --access public"
   },
   "engines": {
     "node": ">=20"

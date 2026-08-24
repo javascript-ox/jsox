@@ -1,5 +1,5 @@
 {
-  "name": "@jsox/rxjs",
+  "name": "@js-ox/rxjs",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -12,11 +12,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@jsox/ui": "*",
+    "@js-ox/ui": "*",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@jsox/compiler": "*",
+    "@js-ox/compiler": "*",
     "vite": "^6.3.5"
   }
 }
