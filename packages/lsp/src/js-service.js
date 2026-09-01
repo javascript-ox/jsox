@@ -11,6 +11,15 @@ function tsName(fileName) {
   return fileName.endsWith(".jsox") ? `${fileName}.js` : fileName;
 }
 
+function physicalJsoxName(fileName) {
+  return fileName.endsWith(".jsox.js") ? fileName.slice(0, -3) : null;
+}
+
+function diskName(fileName) {
+  const physical = physicalJsoxName(fileName);
+  return physical && ts.sys.fileExists(physical) ? physical : fileName;
+}
+
 function origOffsetToGen(entry, offset) {
   return entry.preamble + origToGen(entry.maps, offset);
 }
@@ -60,17 +69,18 @@ export function createJsService() {
     getScriptSnapshot: (fileName) => {
       const doc = docs.get(fileName);
       if (doc) return ts.ScriptSnapshot.fromString(doc.code);
-      const raw = loadDisk(fileName);
+      const raw = loadDisk(diskName(fileName));
       if (raw == null) return undefined;
       return ts.ScriptSnapshot.fromString(raw);
     },
     getCurrentDirectory: () => currentDir,
     getDefaultLibFileName: (opts) => ts.getDefaultLibFilePath(opts),
-    fileExists: (fileName) => docs.has(fileName) || ts.sys.fileExists(fileName),
+    fileExists: (fileName) =>
+      docs.has(fileName) || ts.sys.fileExists(fileName) || diskName(fileName) !== fileName,
     readFile: (fileName) => {
       const doc = docs.get(fileName);
       if (doc) return doc.code;
-      return loadDisk(fileName);
+      return loadDisk(diskName(fileName));
     },
     readDirectory: ts.sys.readDirectory,
     directoryExists: ts.sys.directoryExists,
@@ -137,6 +147,27 @@ export function createJsService() {
     return service.getDefinitionAtPosition(tsName(fileName), genOffset);
   }
 
+  function definitionToOriginal(def) {
+    const physical = physicalJsoxName(def.fileName);
+    if (!physical) return def;
+    let entry = docs.get(def.fileName);
+    if (!entry) {
+      const source = ts.sys.readFile(physical);
+      if (source == null) return def;
+      entry = { source, ...toVirtual(source) };
+    }
+    const start = genOffsetToOrig(entry, def.textSpan.start);
+    const end = genOffsetToOrig(entry, def.textSpan.start + def.textSpan.length);
+    return {
+      ...def,
+      fileName: physical,
+      textSpan: {
+        start: Math.min(start, end),
+        length: Math.abs(end - start),
+      },
+    };
+  }
+
   function signatures(fileName, genOffset) {
     return service.getSignatureHelpItems(tsName(fileName), genOffset, {});
   }
@@ -158,6 +189,7 @@ export function createJsService() {
     completions,
     quickInfo,
     definition,
+    definitionToOriginal,
     signatures,
     diagnostics,
     tsName,

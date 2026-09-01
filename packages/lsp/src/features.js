@@ -117,14 +117,15 @@ export function createJsoxSession() {
               origEnd: Math.max(start, end),
             };
           }
-          const text = ts.sys.readFile(def.fileName);
+          const target = js.definitionToOriginal(def);
+          const text = ts.sys.readFile(target.fileName);
           if (text == null) return null;
           return {
             sameFile: false,
-            fileName: def.fileName,
-            uri: pathToFileURL(def.fileName).href,
-            start: offsetToPos(text, def.textSpan.start),
-            end: offsetToPos(text, def.textSpan.start + def.textSpan.length),
+            fileName: target.fileName,
+            uri: pathToFileURL(target.fileName).href,
+            start: offsetToPos(text, target.textSpan.start),
+            end: offsetToPos(text, target.textSpan.start + target.textSpan.length),
           };
         })
         .filter(Boolean);

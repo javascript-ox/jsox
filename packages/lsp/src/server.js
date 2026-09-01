@@ -183,12 +183,13 @@ export function start() {
             },
           };
         }
-        const text = ts.sys.readFile(def.fileName);
+        const target = js.definitionToOriginal(def);
+        const text = ts.sys.readFile(target.fileName);
         if (text == null) return null;
-        const start = offsetToPos(text, def.textSpan.start);
-        const end = offsetToPos(text, def.textSpan.start + def.textSpan.length);
+        const start = offsetToPos(text, target.textSpan.start);
+        const end = offsetToPos(text, target.textSpan.start + target.textSpan.length);
         return {
-          uri: pathToFileURL(def.fileName).href,
+          uri: pathToFileURL(target.fileName).href,
           range: { start, end },
         };
       })
