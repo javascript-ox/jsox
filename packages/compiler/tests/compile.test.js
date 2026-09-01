@@ -133,6 +133,28 @@ describe("compile: config", () => {
     const code = js(`<div> { ["hi"] }`, { childMethods: [] });
     assert.match(code, /function \$child\(p, \.\.\.n\) \{\}/);
   });
+
+  it("avoids a user-defined child helper binding", () => {
+    const code = js(`const $child = 1; const x = <div> { <span> }`);
+    assert.match(code, /function \$child_1\(p, \.\.\.n\)/);
+    assert.match(code, /\$child_1\(this, document\.createElement\("span"\)\)/);
+    assert.doesNotThrow(() => new Function("document", code));
+  });
+
+  it("uses a configured child helper name", () => {
+    const code = js(`<div> { ["hi"] }`, {
+      childHelperName: "insertChildren",
+    });
+    assert.match(code, /function insertChildren\(p, \.\.\.n\)/);
+    assert.match(code, /insertChildren\(this, "hi"\)/);
+  });
+
+  it("rejects an invalid configured child helper name", () => {
+    assert.throws(
+      () => js(`<div> { ["hi"] }`, { childHelperName: "not-valid!" }),
+      /config\.childHelperName must be a valid JavaScript identifier/,
+    );
+  });
 });
 
 describe("compile: arrays vs captures", () => {
@@ -174,4 +196,3 @@ globalThis.__album = album;
     assert.deepEqual(g.__album.tracks, [{ title: "Wire" }, { title: "Salt" }]);
   });
 });
-
