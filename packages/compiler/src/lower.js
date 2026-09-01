@@ -204,10 +204,27 @@ function childCall(args, config, state) {
   state.usedChild = true;
   return {
     type: "CallExpression",
-    callee: ident("$child"),
+    callee: ident(state.childHelperName),
     arguments: [thisExpr(), ...args],
     optional: false,
   };
+}
+
+function chooseChildHelperName(config, bindings) {
+  const base = config.childHelperName;
+  if (!/^[$_\p{ID_Start}][$\u200C\u200D_\p{ID_Continue}]*$/u.test(base)) {
+    throw new TypeError("config.childHelperName must be a valid JavaScript identifier");
+  }
+  const check = parseSync("config.js", `function ${base}() {}`, {
+    sourceType: "module",
+  });
+  if (check.errors?.length) {
+    throw new TypeError("config.childHelperName must be a valid JavaScript identifier");
+  }
+  let name = base;
+  let suffix = 1;
+  while (bindings.has(name)) name = `${base}_${suffix++}`;
+  return name;
 }
 
 function transformFn(fn, ctx) {
@@ -351,7 +368,10 @@ export function lower(spliced, configInput) {
   }
   const bindings = new Set();
   collectBindings(parsed.program, bindings);
-  const state = { usedChild: false };
+  const state = {
+    usedChild: false,
+    childHelperName: chooseChildHelperName(config, bindings),
+  };
   const program = transform(parsed.program, {
     inConstruct: false,
     statement: false,
@@ -361,7 +381,7 @@ export function lower(spliced, configInput) {
   });
   let code = generate(program);
   if (state.usedChild) {
-    code = childHelperSource(config) + code;
+    code = childHelperSource(config, state.childHelperName) + code;
   }
   assertNoIR(code);
   return { code, usedChild: state.usedChild };
