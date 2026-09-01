@@ -19,16 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out stable
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: main
           path: stable
       - name: Check out development
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: develop
           path: development
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -56,7 +56,7 @@ jobs:
           mkdir -p publish/develop
           cp -R stable/_site/. publish/
           cp -R development/_site/. publish/develop/
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: publish
 
@@ -68,4 +68,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
