@@ -2,13 +2,19 @@ import { defineComponent } from "@js-ox/web-components";
 import { currentPath, resolveRoute } from "./routes.js";
 
 const github = "https://github.com/javascript-ox/jsox";
+const isDevelopment = import.meta.env.VITE_JSOX_CHANNEL === "develop";
 const siteState = new WeakMap();
 
 function render(site) {
   const path = currentPath();
   const outlet = site.querySelector(".outlet");
+  const channelSwitch = site.querySelector(".channel-switch");
+  const channelUrl = new URL(isDevelopment ? "../" : "develop/", document.baseURI);
+  channelUrl.hash = `#${path}`;
+  channelSwitch.href = channelUrl.href;
   outlet.replaceChildren(document.createElement(resolveRoute(path)));
   document.body.classList.toggle("is-home", path === "/");
+  document.body.classList.toggle("is-development", isDevelopment);
 
   for (const link of site.querySelectorAll(".site-nav a[href^='#']")) {
     link.classList.toggle("is-active", link.getAttribute("href") === `#${path}`);
@@ -23,7 +29,15 @@ function render(site) {
       <a> { .href = "#/start"; ["Quick Start"] }
       <a> { .href = "#/tutorial"; ["Basic Tutorial"] }
       <a> {
-        .className = "nav-extra"
+        .className = "channel-switch nav-extra"
+        if (isDevelopment) {
+          <span> { .className = "channel-badge"; ["Development"] }
+          ["View stable"]
+        } else {
+          ["View development"]
+        }
+      }
+      <a> {
         .href = github
         .target = "_blank"
         .rel = "noopener noreferrer"

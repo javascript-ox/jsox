@@ -303,6 +303,23 @@ pre.code {
   margin-left: auto;
 }
 
+.channel-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.channel-badge {
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fffdf8;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .home {
   padding-bottom: 0;
 }
