@@ -96,7 +96,8 @@ class JsoxLexer : LexerBase() {
       c.isWhitespace() -> {
         var i = tokenStart + 1
         while (i < end && buffer[i].isWhitespace()) i++
-        if (buffer.subSequence(tokenStart, i).contains('\n')) atLineStart = true
+        val ws = buffer.subSequence(tokenStart, i)
+        if (ws.contains('\n') || ws.contains('\r')) atLineStart = true
         emit(JsoxTokenTypes.OTHER, i)
       }
       else -> emit(JsoxTokenTypes.PUNCT, tokenStart + 1)
