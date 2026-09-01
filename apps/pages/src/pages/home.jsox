@@ -123,7 +123,7 @@ export function Home() {
             .className = "cta cta-ghost"
             .href = github
             .target = "_blank"
-            .rel = "noreferrer"
+            .rel = "noopener noreferrer"
             ["View on GitHub"]
           }
         }
