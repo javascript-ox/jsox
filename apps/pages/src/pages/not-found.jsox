@@ -1,0 +1,11 @@
+export function NotFound() {
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["404"] }
+    <h1> { ["This page has no route."] }
+    <p> {
+      .className = "lede"
+      <a> { .href = "#/"; ["Back to the overview"] }
+    }
+  }
+}

@@ -1,0 +1,265 @@
+const github = "https://github.com/javascript-ox/jsox";
+
+const vanillaSrc = `const el = document.createElement("button");
+el.type = "button";
+el.className = "btn";
+el.textContent = "Ship it";
+parent.append(el);`;
+
+const jsoxSrc = `[parent] {
+  <button> {
+    .type = "button"
+    .className = "btn"
+    ["Ship it"]
+  }
+}`;
+
+const jsxSrc = `const el = (
+  <button type="button" className="btn">
+    Ship it
+  </button>
+);`;
+
+const examples = [
+  {
+    href: "#/hello",
+    kicker: "01",
+    title: "Hello",
+    blurb: "Nested tags, text captures, and a for-of list — without closing tags.",
+  },
+  {
+    href: "#/counter",
+    kicker: "02",
+    title: "Counter",
+    blurb: "Capture a node, keep the reference, and update it. State is an ordinary variable.",
+  },
+  {
+    href: "#/todo",
+    kicker: "03",
+    title: "Todo",
+    blurb: "Construct an item and add it to a live list. The list is just another object.",
+  },
+  {
+    href: "#/pojo",
+    kicker: "04",
+    title: "POJO",
+    blurb: "The same syntax builds plain objects. If the target implements add(), JSOX uses it.",
+  },
+  {
+    href: "#/rxjs",
+    kicker: "05",
+    title: "RxJS",
+    blurb: "JSOX constructs the DOM. Streams own the updates — no render cycle in between.",
+  },
+  {
+    href: "#/web-components",
+    kicker: "06",
+    title: "Web Components",
+    blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
+  },
+];
+
+const pillars = [
+  {
+    mark: "<tag>",
+    title: "Create",
+    body: "A tag constructs an object. The block that follows runs as its initializer, with this bound to the value just created.",
+  },
+  {
+    mark: ".prop",
+    title: "Configure",
+    body: "A leading dot is this. .className is this.className. You configure the object while it is still being constructed.",
+  },
+  {
+    mark: "[value]",
+    title: "Compose",
+    body: "Brackets add a part: a string, another object, or the result of a call. Construction nests because objects nest.",
+  },
+];
+
+const boasts = [
+  { n: "0", l: "closing tags" },
+  { n: "0", l: "virtual DOM" },
+  { n: "0", l: "runtime library" },
+  { n: "1", l: "compile step" },
+];
+
+const ticker = [
+  "<button>",
+  ".className",
+  "[child]",
+  "this",
+  "construct",
+  "POJO",
+  "add()",
+  "compile-time",
+  "JavaScript",
+  ".onclick",
+  "[list]",
+  "<custom-el>",
+];
+
+export function Home() {
+  return <main> {
+    .className = "home"
+    <section> {
+      .className = "hero"
+      <div> {
+        .className = "hero-inner"
+        <p> { .className = "kicker kicker-light"; ["JavaScript Object eXtensions"] }
+        <h1> {
+          .className = "hero-title"
+          ["Construct objects "]
+          <em> { ["where you mean them."] }
+        }
+        <p> {
+          .className = "hero-lede"
+          ["JSOX is a JavaScript dialect for functional object construction. A construct block runs with this bound to the value being built — a DOM element, a plain object, anything that can receive parts. Tags create, leading dots configure, brackets compose. It compiles to ordinary JavaScript."]
+        }
+        <div> {
+          .className = "cta-row"
+          <a> { .className = "cta cta-solid"; .href = "#/start"; ["Quick start"] }
+          <a> {
+            .className = "cta cta-ghost"
+            .href = github
+            .target = "_blank"
+            .rel = "noopener noreferrer"
+            ["View on GitHub"]
+          }
+        }
+        <ul> {
+          .className = "boasts"
+          for (const b of boasts) {
+            <li> {
+              <strong> { [b.n] }
+              <span> { [b.l] }
+            }
+          }
+        }
+      }
+    }
+
+    <div> {
+      .className = "ticker"
+      .setAttribute("aria-hidden", "true")
+      <div> {
+        .className = "ticker-track"
+        for (const bit of [...ticker, ...ticker]) {
+          <span> { [bit] }
+        }
+      }
+    }
+
+    <section> {
+      .className = "home-wrap"
+      <p> { .className = "kicker"; ["Three marks. That is the whole dialect."] }
+      <h2> { .className = "section-title"; ["Create, configure, compose."] }
+      <p> {
+        .className = "section-lede"
+        ["Not a renderer and not a component model. Object construction as an expression: the block is the constructor body, this is the object, and nesting is just more construction."]
+      }
+      <ul> {
+        .className = "pillars"
+        for (const p of pillars) {
+          <li> {
+            .className = "pillar"
+            <p> { .className = "pillar-mark"; [p.mark] }
+            <h3> { [p.title] }
+            <p> { [p.body] }
+          }
+        }
+      }
+    }
+
+    <section> {
+      .className = "compare-band"
+      <div> {
+        .className = "home-wrap"
+        <p> { .className = "kicker"; ["Same button, three spellings"] }
+        <h2> { .className = "section-title"; ["Construction should read as construction."] }
+        <div> {
+          .className = "compare"
+          <figure> {
+            .className = "code-pane"
+            <figcaption> { ["Vanilla JavaScript"] }
+            <pre> { .className = "code"; [vanillaSrc] }
+          }
+          <figure> {
+            .className = "code-pane code-pane-accent"
+            <figcaption> { ["JSOX"] }
+            <pre> { .className = "code"; [jsoxSrc] }
+          }
+          <figure> {
+            .className = "code-pane"
+            <figcaption> { ["JSX"] }
+            <pre> { .className = "code"; [jsxSrc] }
+          }
+        }
+        <p> {
+          .className = "compare-note"
+          ["No virtual DOM, no extra import, no closing tags. JSOX compiles to the same create-and-assign JavaScript you would write by hand — the object is built in one expression instead of a list of follow-up statements."]
+        }
+      }
+    }
+
+    <section> {
+      .className = "home-wrap manifesto"
+      <p> { .className = "kicker"; ["Design"] }
+      <h2> { .className = "section-title"; ["A dialect, not a framework."] }
+      <ol> {
+        .className = "manifesto-list"
+        <li> { ["An object should be constructed as an expression, not assembled afterward with a trail of assignments."] }
+        <li> { ["Inside a construct block, this is the object under construction. A leading .prop is this.prop."] }
+        <li> { ["[value] composes another value into that object: text, a nested construct, or the result of a call."] }
+        <li> { ["The target can be an HTMLElement, a plain object with add(), or an array that can push. The DOM is one kind of object, not a special syntax."] }
+        <li> { ["You still write JavaScript and you still ship JavaScript. JSOX is a compile-time spelling for construction, not a new runtime."] }
+      }
+    }
+
+    <section> {
+      .className = "home-wrap"
+      <p> { .className = "kicker"; ["Examples"] }
+      <h2> { .className = "section-title"; ["Six small apps, one dialect."] }
+      <p> {
+        .className = "section-lede"
+        ["Each example is a real page. DOM widgets, a plain-object album, streams that update nodes JSOX already constructed."]
+      }
+      <ul> {
+        .className = "grid pitch-grid"
+        for (const ex of examples) {
+          <li> {
+            <a> {
+              .className = "card pitch-card"
+              .href = ex.href
+              <p> { .className = "kicker"; [ex.kicker] }
+              <h2> { [ex.title] }
+              <p> { [ex.blurb] }
+            }
+          }
+        }
+      }
+    }
+
+    <section> {
+      .className = "closer"
+      <div> {
+        .className = "home-wrap closer-inner"
+        <p> { .className = "kicker kicker-light"; ["Get started"] }
+        <h2> { .className = "section-title section-title-light"; ["Start with an object. Keep constructing."] }
+        <p> {
+          .className = "hero-lede"
+          ["JSOX is a compile-time dialect. Install @js-ox/compiler, name the file .jsox, and construct in place. It works with the bundler you already have."]
+        }
+        <div> {
+          .className = "cta-row"
+          <a> { .className = "cta cta-solid"; .href = "#/start"; ["Quick start"] }
+          <a> {
+            .className = "cta cta-ghost"
+            .href = "#/tutorial"
+            ["Basic tutorial"]
+          }
+        }
+      }
+    }
+  }
+}

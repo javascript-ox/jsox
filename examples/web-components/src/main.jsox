@@ -1,0 +1,5 @@
+import { WebComponents } from "./view.jsox";
+
+[document.body] {
+  [WebComponents()]
+}

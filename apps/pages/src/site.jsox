@@ -1,0 +1,56 @@
+import { defineComponent } from "@js-ox/web-components";
+import { currentPath, resolveRoute } from "./routes.js";
+
+const github = "https://github.com/javascript-ox/jsox";
+const siteState = new WeakMap();
+
+function render(site) {
+  const path = currentPath();
+  const outlet = site.querySelector(".outlet");
+  outlet.replaceChildren(document.createElement(resolveRoute(path)));
+  document.body.classList.toggle("is-home", path === "/");
+
+  for (const link of site.querySelectorAll(".site-nav a[href^='#']")) {
+    link.classList.toggle("is-active", link.getAttribute("href") === `#${path}`);
+  }
+}
+
+[defineComponent("jsox-site")] {
+  .template = <div> {
+    <header> {
+      .className = "site-nav"
+      <a> { .className = "brand"; .href = "#/"; ["JSOX"] }
+      <a> { .href = "#/start"; ["Quick Start"] }
+      <a> { .href = "#/tutorial"; ["Basic Tutorial"] }
+      <a> {
+        .className = "nav-extra"
+        .href = github
+        .target = "_blank"
+        .rel = "noopener noreferrer"
+        ["GitHub"]
+      }
+    }
+    <div> { .className = "outlet" }
+    <footer> {
+      .className = "site-foot"
+      <p> { ["JSOX — JavaScript Object eXtensions. A compile-time dialect for constructing objects."] }
+      <p> {
+        <a> { .href = github; .target = "_blank"; .rel = "noreferrer"; ["github.com/javascript-ox/jsox"] }
+      }
+    }
+  }
+  .connected = function () {
+    if (siteState.has(this)) return
+    const onHashChange = () => render(this)
+    siteState.set(this, onHashChange)
+    window.addEventListener("hashchange", onHashChange)
+    render(this)
+  }
+  .disconnected = function () {
+    const onHashChange = siteState.get(this)
+    if (!onHashChange) return
+    window.removeEventListener("hashchange", onHashChange)
+    siteState.delete(this)
+  }
+  .register()
+}
