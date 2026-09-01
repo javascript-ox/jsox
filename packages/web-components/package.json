@@ -1,0 +1,41 @@
+{
+  "name": "@js-ox/web-components",
+  "version": "0.1.0",
+  "description": "Small JSOX-friendly helpers for defining native web components",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/javascript-ox/jsox.git",
+    "directory": "packages/web-components"
+  },
+  "homepage": "https://github.com/javascript-ox/jsox",
+  "bugs": {
+    "url": "https://github.com/javascript-ox/jsox/issues"
+  },
+  "keywords": [
+    "jsox",
+    "web-components",
+    "custom-elements"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@js-ox/compiler": "^0.1.1",
+    "jsdom": "^26.1.0"
+  }
+}

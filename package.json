@@ -8,7 +8,7 @@
     "examples/*"
   ],
   "scripts": {
-    "test": "npm test -w @js-ox/compiler && npm test -w @js-ox/lsp",
+    "test": "npm test -w @js-ox/compiler && npm test -w @js-ox/lsp && npm test -w @js-ox/web-components",
     "lsp": "node packages/lsp/src/cli.js",
     "example:hello": "npm run dev -w @js-ox/hello",
     "example:counter": "npm run dev -w @js-ox/counter",
@@ -20,7 +20,8 @@
     "build:pages": "npm run build -w @js-ox/pages",
     "build:site": "npm run build:examples && npm run build:pages && node apps/pages/assemble.js",
     "publish:compiler": "npm publish -w @js-ox/compiler --access public",
-    "publish:lsp": "npm publish -w @js-ox/lsp --access public"
+    "publish:lsp": "npm publish -w @js-ox/lsp --access public",
+    "publish:web-components": "npm publish -w @js-ox/web-components --access public"
   },
   "engines": {
     "node": ">=20"

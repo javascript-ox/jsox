@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createJsoxSession } from "../src/features.js";
 
 describe("jsox session", () => {
@@ -93,5 +94,30 @@ describe("jsox session", () => {
     assert.ok(classified.some((token) => token.text === "clockEl" && token.type === 7));
     assert.ok(classified.some((token) => token.text === "className" && token.type === 9));
     assert.ok(classified.some((token) => token.text === "dateTime" && token.type === 9));
+  });
+
+  it("accepts and completes web components registered with defineComponent", () => {
+    const session = createJsoxSession();
+    const file = fileURLToPath(new URL("web-component.jsox", import.meta.url));
+    const source = `import { defineComponent } from "../../web-components/src/index.js";
+[defineComponent("message-card")] {
+  .connected = function () { this.dataset.ready = "yes" }
+  .register()
+}
+const card = <message-card> {
+  .id = "example"
+}
+`;
+    session.upsert(file, source);
+
+    assert.deepEqual(session.diagnostics(file), []);
+    const hover = session.hover(file, source.indexOf("card ="));
+    assert.match(hover.text, /HTMLElement/);
+
+    const incomplete = `${source}\nconst another = <message-`;
+    session.upsert(file, incomplete);
+    const completions = session.completions(file, incomplete.length, incomplete);
+    const component = completions.find((item) => item.label === "message-card");
+    assert.equal(component?.detail, "Registered web component");
   });
 });
