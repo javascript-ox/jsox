@@ -23,18 +23,18 @@ export function normalizeConfig(input = {}) {
 }
 
 export async function loadConfig(dir = process.cwd()) {
+  const { access } = await import("node:fs/promises");
   const { pathToFileURL } = await import("node:url");
   const { join } = await import("node:path");
-  const url = pathToFileURL(join(dir, "jsox.config.js")).href;
+  const path = join(dir, "jsox.config.js");
   try {
-    const mod = await import(url);
-    return normalizeConfig(mod.default ?? mod);
+    await access(path);
   } catch (err) {
-    if (err && (err.code === "ERR_MODULE_NOT_FOUND" || err.code === "ENOENT")) {
-      return normalizeConfig();
-    }
+    if (err?.code === "ENOENT") return normalizeConfig();
     throw err;
   }
+  const mod = await import(pathToFileURL(path).href);
+  return normalizeConfig(mod.default ?? mod);
 }
 
 export function childHelperSource(config, helperName = config.childHelperName) {
