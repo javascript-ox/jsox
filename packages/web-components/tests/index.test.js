@@ -59,6 +59,58 @@ describe("defineComponent", () => {
     ]);
   });
 
+  it("preserves lifecycle callbacks implemented by a custom base class", () => {
+    const { window, options } = environment();
+    const calls = [];
+    class ComponentBase extends window.HTMLElement {
+      connectedCallback() {
+        calls.push("base connected");
+      }
+
+      disconnectedCallback() {
+        calls.push("base disconnected");
+      }
+
+      adoptedCallback() {
+        calls.push("base adopted");
+      }
+
+      attributeChangedCallback(name, oldValue, newValue) {
+        calls.push(["base attribute", name, oldValue, newValue]);
+      }
+    }
+
+    const definition = defineComponent("based-card", {
+      ...options,
+      base: ComponentBase,
+    });
+    definition.observedAttributes = ["status"];
+    definition.connected = () => calls.push("definition connected");
+    definition.disconnected = () => calls.push("definition disconnected");
+    definition.adopted = () => calls.push("definition adopted");
+    definition.attributeChanged = (name, oldValue, newValue) => {
+      calls.push(["definition attribute", name, oldValue, newValue]);
+    };
+    definition.register();
+
+    const element = window.document.createElement("based-card");
+    element.setAttribute("status", "ready");
+    window.document.body.append(element);
+    element.remove();
+    element.adoptedCallback();
+
+    assert.deepEqual(calls, [
+      ["base attribute", "status", null, "ready"],
+      ["definition attribute", "status", null, "ready"],
+      "base connected",
+      "definition connected",
+      "base disconnected",
+      "definition disconnected",
+      "base adopted",
+      "definition adopted",
+    ]);
+  });
+
   it("clones the content of a native template element", () => {
     const { window, options } = environment();
     const definition = defineComponent("template-card", options);

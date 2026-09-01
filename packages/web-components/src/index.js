@@ -58,6 +58,7 @@ export class ComponentDefinition {
       #templateInitialized = false;
 
       connectedCallback() {
+        super.connectedCallback?.();
         if (!this.#templateInitialized) {
           this.#templateInitialized = true;
           const content = cloneTemplate(template);
@@ -67,14 +68,17 @@ export class ComponentDefinition {
       }
 
       disconnectedCallback() {
+        super.disconnectedCallback?.();
         disconnected?.call(this);
       }
 
       adoptedCallback() {
+        super.adoptedCallback?.();
         adopted?.call(this);
       }
 
       attributeChangedCallback(name, oldValue, newValue) {
+        super.attributeChangedCallback?.(name, oldValue, newValue);
         attributeChanged?.call(this, name, oldValue, newValue);
       }
     }
