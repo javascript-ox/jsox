@@ -342,9 +342,18 @@ function transform(node, ctx) {
   );
 }
 
-function assertNoIR(code) {
-  if (code.includes(EL) || code.includes(SCOPE)) {
+function assertNoIR(node) {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const child of node) assertNoIR(child);
+    return;
+  }
+  if (isIRCall(node, EL) || isIRCall(node, SCOPE)) {
     throw new Error(`IR leaked into output: found ${EL} or ${SCOPE}`);
+  }
+  for (const [key, child] of Object.entries(node)) {
+    if (walkSkipKeys(key)) continue;
+    assertNoIR(child);
   }
 }
 
@@ -383,6 +392,6 @@ export function lower(spliced, configInput) {
   if (state.usedChild) {
     code = childHelperSource(config, state.childHelperName) + code;
   }
-  assertNoIR(code);
+  assertNoIR(program);
   return { code, usedChild: state.usedChild };
 }
