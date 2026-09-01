@@ -21,6 +21,17 @@ describe("splice: <tag>", () => {
     assert.equal(splice("a < b && c > d").trim(), "a < b && c > d");
   });
 
+  it("leaves multiline comparisons alone", () => {
+    const source = `const x = a
+< b > c;`;
+    assert.equal(splice(source), source);
+  });
+
+  it("requires tag names to touch both delimiters", () => {
+    assert.equal(splice("< div>"), "< div>");
+    assert.equal(splice("<div >"), "<div >");
+  });
+
   it("leaves array index alone", () => {
     assert.equal(splice("arr[i]").trim(), "arr[i]");
   });
