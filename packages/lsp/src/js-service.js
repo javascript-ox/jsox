@@ -172,6 +172,54 @@ export function createJsService() {
     return service.getSignatureHelpItems(tsName(fileName), genOffset, {});
   }
 
+  function semanticTokens(fileName) {
+    const name = tsName(fileName);
+    const entry = docs.get(name);
+    if (!entry || entry.error) return [];
+    const result = service.getEncodedSemanticClassifications(
+      name,
+      { start: 0, length: entry.code.length },
+      ts.SemanticClassificationFormat.TwentyTwenty,
+    );
+    const tokens = [];
+    for (let i = 0; i < result.spans.length; i += 3) {
+      const genStart = result.spans[i];
+      const genLength = result.spans[i + 1];
+      const classification = result.spans[i + 2];
+      if (genStart < entry.preamble) continue;
+      if (entry.code.slice(genStart, genStart + genLength).startsWith("__jsox_")) continue;
+      const start = genOffsetToOrig(entry, genStart);
+      const end = genOffsetToOrig(entry, genStart + genLength);
+      if (end <= start || end > entry.source.length) continue;
+      tokens.push({
+        start,
+        end,
+        type: (classification >> 8) - 1,
+        modifiers: classification & 0xff,
+      });
+    }
+    const shorthand = /(?:^|\n)[\t ]*\.([A-Za-z_$][\w$]*)/g;
+    for (const match of entry.source.matchAll(shorthand)) {
+      const name = match[1];
+      const start = match.index + match[0].lastIndexOf(name);
+      const info = service.getQuickInfoAtPosition(tsName(fileName), origOffsetToGen(entry, start));
+      tokens.push({
+        start,
+        end: start + name.length,
+        type:
+          info?.kind === ts.ScriptElementKind.memberFunctionElement
+            ? 11
+            : 9,
+        modifiers: 0,
+      });
+    }
+    tokens.sort((a, b) => a.start - b.start || a.end - b.end);
+    return tokens.reduce((out, token) => {
+      if (!out.length || token.start >= out[out.length - 1].end) out.push(token);
+      return out;
+    }, []);
+  }
+
   function diagnostics(fileName) {
     const name = tsName(fileName);
     return [
@@ -191,6 +239,7 @@ export function createJsService() {
     definition,
     definitionToOriginal,
     signatures,
+    semanticTokens,
     diagnostics,
     tsName,
   };

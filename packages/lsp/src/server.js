@@ -4,12 +4,36 @@ import {
   TextDocumentSyncKind,
   CompletionItemKind,
   DiagnosticSeverity,
+  SemanticTokensBuilder,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import ts from "typescript";
 import { createJsService } from "./js-service.js";
 import { tagCompletions } from "./tags.js";
+
+const SEMANTIC_TOKEN_TYPES = [
+  "class",
+  "enum",
+  "interface",
+  "namespace",
+  "typeParameter",
+  "type",
+  "parameter",
+  "variable",
+  "enumMember",
+  "property",
+  "function",
+  "method",
+];
+
+const SEMANTIC_TOKEN_MODIFIERS = [
+  "declaration",
+  "static",
+  "async",
+  "readonly",
+  "defaultLibrary",
+];
 
 export function start() {
   const connection = createConnection(process.stdin, process.stdout);
@@ -32,6 +56,13 @@ export function start() {
       hoverProvider: true,
       definitionProvider: true,
       signatureHelpProvider: { triggerCharacters: ["(", ","] },
+      semanticTokensProvider: {
+        legend: {
+          tokenTypes: SEMANTIC_TOKEN_TYPES,
+          tokenModifiers: SEMANTIC_TOKEN_MODIFIERS,
+        },
+        full: { delta: false },
+      },
     },
     serverInfo: { name: "JSOX", version: "0.1.0" },
   }));
@@ -227,6 +258,29 @@ export function start() {
         };
       }),
     };
+  });
+
+  connection.languages.semanticTokens.on((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return { data: [] };
+    const fileName = pathOf(doc.uri);
+    const entry = js.get(fileName) || js.upsert(fileName, doc.getText());
+    if (!entry || entry.error) return { data: [] };
+    const builder = new SemanticTokensBuilder();
+    const tokens = js.semanticTokens(fileName);
+    for (const token of tokens) {
+      const start = doc.positionAt(token.start);
+      const end = doc.positionAt(token.end);
+      if (start.line !== end.line || end.character <= start.character) continue;
+      builder.push(
+        start.line,
+        start.character,
+        end.character - start.character,
+        token.type,
+        token.modifiers & 0x1f,
+      );
+    }
+    return builder.build();
   });
 
   documents.listen(connection);

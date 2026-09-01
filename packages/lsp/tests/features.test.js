@@ -71,4 +71,27 @@ describe("jsox session", () => {
     assert.equal(defs[0].fileName, dependency);
     assert.deepEqual(defs[0].start, { line: 0, character: 16 });
   });
+
+  it("classifies JavaScript and consecutive shorthand properties", () => {
+    const session = createJsoxSession();
+    const file = "/tmp/features-semantic.jsox";
+    const source = `export function Rxjs() {
+  const clockEl = <time> {
+    .className = "clock"
+    .dateTime = ""
+  }
+  return clockEl;
+}
+`;
+    session.upsert(file, source);
+    const tokens = session.semanticTokens(file);
+    const classified = tokens.map((token) => ({
+      text: source.slice(token.start, token.end),
+      type: token.type,
+    }));
+    assert.ok(classified.some((token) => token.text === "Rxjs" && token.type === 10));
+    assert.ok(classified.some((token) => token.text === "clockEl" && token.type === 7));
+    assert.ok(classified.some((token) => token.text === "className" && token.type === 9));
+    assert.ok(classified.some((token) => token.text === "dateTime" && token.type === 9));
+  });
 });

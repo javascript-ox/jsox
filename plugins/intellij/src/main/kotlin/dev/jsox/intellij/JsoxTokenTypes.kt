@@ -9,6 +9,7 @@ object JsoxTokenTypes {
   @JvmField val STRING = IElementType("JSOX_STRING", JsoxLanguage)
   @JvmField val COMMENT = IElementType("JSOX_COMMENT", JsoxLanguage)
   @JvmField val TAG = IElementType("JSOX_TAG", JsoxLanguage)
+  @JvmField val SELECTOR_BRACKET = IElementType("JSOX_SELECTOR_BRACKET", JsoxLanguage)
   @JvmField val PROPERTY = IElementType("JSOX_PROPERTY", JsoxLanguage)
   @JvmField val PUNCT = IElementType("JSOX_PUNCT", JsoxLanguage)
   @JvmField val OTHER = IElementType("JSOX_OTHER", JsoxLanguage)

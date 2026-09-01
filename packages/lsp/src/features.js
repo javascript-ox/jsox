@@ -159,6 +159,10 @@ export function createJsoxSession() {
       };
     },
 
+    semanticTokens(fileName) {
+      return js.semanticTokens(fileName);
+    },
+
     diagnostics(fileName) {
       const entry = js.get(fileName);
       if (!entry) return [];
