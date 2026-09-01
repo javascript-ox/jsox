@@ -125,14 +125,24 @@ export function tagPrefix(source, offset) {
   return m[1] ?? "";
 }
 
+export function registeredComponentTags(source) {
+  const tags = new Set();
+  const definition = /\bdefineComponent\s*\(\s*(["'])([a-z][\w.-]*-[\w.-]+)\1/g;
+  for (const match of source.matchAll(definition)) tags.add(match[2]);
+  return [...tags].sort();
+}
+
 export function tagCompletions(source, offset) {
   const prefix = tagPrefix(source, offset);
   if (prefix == null) return null;
   const lower = prefix.toLowerCase();
-  return HTML_TAGS.filter((tag) => tag.startsWith(lower)).map((tag) => ({
-    label: tag,
-    kind: 7, // CompletionItemKind.Class
-    detail: "HTML element",
-    insertText: tag,
-  }));
+  const registered = new Set(registeredComponentTags(source));
+  return [...registered, ...HTML_TAGS]
+    .filter((tag, index, tags) => tag.startsWith(lower) && tags.indexOf(tag) === index)
+    .map((tag) => ({
+      label: tag,
+      kind: 7, // CompletionItemKind.Class
+      detail: registered.has(tag) ? "Registered web component" : "HTML element",
+      insertText: tag,
+    }));
 }

@@ -11,16 +11,16 @@ export class ComponentDefinition {
   /** @type {boolean} */
   formAssociated = false;
 
-  /** @type {((...args: any[]) => void) | null} */
+  /** @type {((this: HTMLElement) => void) | null} */
   connected = null;
 
-  /** @type {((...args: any[]) => void) | null} */
+  /** @type {((this: HTMLElement) => void) | null} */
   disconnected = null;
 
-  /** @type {((...args: any[]) => void) | null} */
+  /** @type {((this: HTMLElement) => void) | null} */
   adopted = null;
 
-  /** @type {((name: string, oldValue: string | null, newValue: string | null) => void) | null} */
+  /** @type {((this: HTMLElement, name: string, oldValue: string | null, newValue: string | null) => void) | null} */
   attributeChanged = null;
 
   #name;
