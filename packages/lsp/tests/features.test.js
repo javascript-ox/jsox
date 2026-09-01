@@ -1,5 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { createJsoxSession } from "../src/features.js";
 
 describe("jsox session", () => {
@@ -47,5 +50,48 @@ describe("jsox session", () => {
     assert.ok(defs.length);
     assert.equal(defs[0].sameFile, true);
     assert.ok(defs[0].origStart <= source.indexOf("el"));
+  });
+
+  it("resolves and navigates to an unopened jsox import", async (t) => {
+    const dir = await mkdtemp(join(tmpdir(), "jsox-import-"));
+    t.after(() => rm(dir, { recursive: true, force: true }));
+    const dependency = join(dir, "view.jsox");
+    const importer = join(dir, "main.jsox");
+    const dependencySource = `export function Counter() { return <button>; }\n`;
+    const importerSource = `import { Counter } from "./view.jsox";\nCounter();\n`;
+    await writeFile(dependency, dependencySource);
+
+    const session = createJsoxSession();
+    session.upsert(importer, importerSource);
+
+    assert.deepEqual(session.diagnostics(importer), []);
+    const defs = session.definition(importer, importerSource.lastIndexOf("Counter"));
+    assert.equal(defs.length, 1);
+    assert.equal(defs[0].sameFile, false);
+    assert.equal(defs[0].fileName, dependency);
+    assert.deepEqual(defs[0].start, { line: 0, character: 16 });
+  });
+
+  it("classifies JavaScript and consecutive shorthand properties", () => {
+    const session = createJsoxSession();
+    const file = "/tmp/features-semantic.jsox";
+    const source = `export function Rxjs() {
+  const clockEl = <time> {
+    .className = "clock"
+    .dateTime = ""
+  }
+  return clockEl;
+}
+`;
+    session.upsert(file, source);
+    const tokens = session.semanticTokens(file);
+    const classified = tokens.map((token) => ({
+      text: source.slice(token.start, token.end),
+      type: token.type,
+    }));
+    assert.ok(classified.some((token) => token.text === "Rxjs" && token.type === 10));
+    assert.ok(classified.some((token) => token.text === "clockEl" && token.type === 7));
+    assert.ok(classified.some((token) => token.text === "className" && token.type === 9));
+    assert.ok(classified.some((token) => token.text === "dateTime" && token.type === 9));
   });
 });

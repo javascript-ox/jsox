@@ -19,6 +19,7 @@ class JsoxLexer : LexerBase() {
   private var tokenEnd = 0
   private var type: IElementType? = null
   private var lastNonWs: Char? = null
+  private var atLineStart = true
 
   override fun start(buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int) {
     this.buffer = buffer
@@ -27,6 +28,7 @@ class JsoxLexer : LexerBase() {
     tokenStart = startOffset
     tokenEnd = startOffset
     lastNonWs = null
+    atLineStart = linePrefixIsWhitespace(startOffset)
     advance()
   }
 
@@ -74,6 +76,7 @@ class JsoxLexer : LexerBase() {
         if (i < end && buffer[i] == '>') emit(JsoxTokenTypes.TAG, i + 1)
         else emit(JsoxTokenTypes.PUNCT, tokenStart + 1)
       }
+      c == '[' || c == ']' -> emit(JsoxTokenTypes.SELECTOR_BRACKET, tokenStart + 1)
       c == '.' && thisShorthand() && tokenStart + 1 < end && isIdentStart(buffer[tokenStart + 1]) -> {
         var i = tokenStart + 2
         while (i < end && isIdentPart(buffer[i])) i++
@@ -93,6 +96,8 @@ class JsoxLexer : LexerBase() {
       c.isWhitespace() -> {
         var i = tokenStart + 1
         while (i < end && buffer[i].isWhitespace()) i++
+        val ws = buffer.subSequence(tokenStart, i)
+        if (ws.contains('\n') || ws.contains('\r')) atLineStart = true
         emit(JsoxTokenTypes.OTHER, i)
       }
       else -> emit(JsoxTokenTypes.PUNCT, tokenStart + 1)
@@ -106,12 +111,22 @@ class JsoxLexer : LexerBase() {
       var i = to - 1
       while (i >= tokenStart && buffer[i].isWhitespace()) i--
       if (i >= tokenStart) lastNonWs = buffer[i]
+      atLineStart = false
     }
   }
 
   private fun thisShorthand(): Boolean {
     val prev = lastNonWs
-    return prev == null || prev == '{' || prev == ';' || prev == '}' || prev == '(' || prev == ','
+    return atLineStart || prev == null || prev == '{' || prev == ';' || prev == '}' || prev == '(' || prev == ','
+  }
+
+  private fun linePrefixIsWhitespace(offset: Int): Boolean {
+    var i = offset - 1
+    while (i >= 0 && buffer[i] != '\n' && buffer[i] != '\r') {
+      if (!buffer[i].isWhitespace()) return false
+      i--
+    }
+    return true
   }
 
   private fun peek(n: Int): Char? {

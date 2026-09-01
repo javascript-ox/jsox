@@ -11,6 +11,15 @@ function tsName(fileName) {
   return fileName.endsWith(".jsox") ? `${fileName}.js` : fileName;
 }
 
+function physicalJsoxName(fileName) {
+  return fileName.endsWith(".jsox.js") ? fileName.slice(0, -3) : null;
+}
+
+function diskName(fileName) {
+  const physical = physicalJsoxName(fileName);
+  return physical && ts.sys.fileExists(physical) ? physical : fileName;
+}
+
 function origOffsetToGen(entry, offset) {
   return entry.preamble + origToGen(entry.maps, offset);
 }
@@ -60,17 +69,18 @@ export function createJsService() {
     getScriptSnapshot: (fileName) => {
       const doc = docs.get(fileName);
       if (doc) return ts.ScriptSnapshot.fromString(doc.code);
-      const raw = loadDisk(fileName);
+      const raw = loadDisk(diskName(fileName));
       if (raw == null) return undefined;
       return ts.ScriptSnapshot.fromString(raw);
     },
     getCurrentDirectory: () => currentDir,
     getDefaultLibFileName: (opts) => ts.getDefaultLibFilePath(opts),
-    fileExists: (fileName) => docs.has(fileName) || ts.sys.fileExists(fileName),
+    fileExists: (fileName) =>
+      docs.has(fileName) || ts.sys.fileExists(fileName) || diskName(fileName) !== fileName,
     readFile: (fileName) => {
       const doc = docs.get(fileName);
       if (doc) return doc.code;
-      return loadDisk(fileName);
+      return loadDisk(diskName(fileName));
     },
     readDirectory: ts.sys.readDirectory,
     directoryExists: ts.sys.directoryExists,
@@ -137,8 +147,77 @@ export function createJsService() {
     return service.getDefinitionAtPosition(tsName(fileName), genOffset);
   }
 
+  function definitionToOriginal(def) {
+    const physical = physicalJsoxName(def.fileName);
+    if (!physical) return def;
+    let entry = docs.get(def.fileName);
+    if (!entry) {
+      const source = ts.sys.readFile(physical);
+      if (source == null) return def;
+      entry = { source, ...toVirtual(source) };
+    }
+    const start = genOffsetToOrig(entry, def.textSpan.start);
+    const end = genOffsetToOrig(entry, def.textSpan.start + def.textSpan.length);
+    return {
+      ...def,
+      fileName: physical,
+      textSpan: {
+        start: Math.min(start, end),
+        length: Math.abs(end - start),
+      },
+    };
+  }
+
   function signatures(fileName, genOffset) {
     return service.getSignatureHelpItems(tsName(fileName), genOffset, {});
+  }
+
+  function semanticTokens(fileName) {
+    const name = tsName(fileName);
+    const entry = docs.get(name);
+    if (!entry || entry.error) return [];
+    const result = service.getEncodedSemanticClassifications(
+      name,
+      { start: 0, length: entry.code.length },
+      ts.SemanticClassificationFormat.TwentyTwenty,
+    );
+    const tokens = [];
+    for (let i = 0; i < result.spans.length; i += 3) {
+      const genStart = result.spans[i];
+      const genLength = result.spans[i + 1];
+      const classification = result.spans[i + 2];
+      if (genStart < entry.preamble) continue;
+      if (entry.code.slice(genStart, genStart + genLength).startsWith("__jsox_")) continue;
+      const start = genOffsetToOrig(entry, genStart);
+      const end = genOffsetToOrig(entry, genStart + genLength);
+      if (end <= start || end > entry.source.length) continue;
+      tokens.push({
+        start,
+        end,
+        type: (classification >> 8) - 1,
+        modifiers: classification & 0xff,
+      });
+    }
+    const shorthand = /(?:^|\n)[\t ]*\.([A-Za-z_$][\w$]*)/g;
+    for (const match of entry.source.matchAll(shorthand)) {
+      const name = match[1];
+      const start = match.index + match[0].lastIndexOf(name);
+      const info = service.getQuickInfoAtPosition(tsName(fileName), origOffsetToGen(entry, start));
+      tokens.push({
+        start,
+        end: start + name.length,
+        type:
+          info?.kind === ts.ScriptElementKind.memberFunctionElement
+            ? 11
+            : 9,
+        modifiers: 0,
+      });
+    }
+    tokens.sort((a, b) => a.start - b.start || a.end - b.end);
+    return tokens.reduce((out, token) => {
+      if (!out.length || token.start >= out[out.length - 1].end) out.push(token);
+      return out;
+    }, []);
   }
 
   function diagnostics(fileName) {
@@ -158,7 +237,9 @@ export function createJsService() {
     completions,
     quickInfo,
     definition,
+    definitionToOriginal,
     signatures,
+    semanticTokens,
     diagnostics,
     tsName,
   };

@@ -106,6 +106,7 @@ describe("jsox-lsp protocol", () => {
       assert.equal(init.serverInfo?.name, "JSOX");
       assert.equal(init.capabilities.hoverProvider, true);
       assert.equal(init.capabilities.completionProvider.triggerCharacters.includes("."), true);
+      assert.deepEqual(init.capabilities.semanticTokensProvider.full, { delta: false });
       server.notify("initialized", {});
 
       const uri = "file:///tmp/protocol-view.jsox";
@@ -137,6 +138,11 @@ describe("jsox-lsp protocol", () => {
         (c) => c.label,
       );
       assert.ok(labels.includes("className") || labels.includes("type") || labels.includes("addEventListener"));
+
+      const semantic = await server.request("textDocument/semanticTokens/full", {
+        textDocument: { uri },
+      });
+      assert.ok(semantic.data.length > 0);
     } finally {
       await server.shutdown();
     }

@@ -16,6 +16,7 @@ class JsoxSyntaxHighlighter : SyntaxHighlighterBase() {
       JsoxTokenTypes.COMMENT -> KEYS_COMMENT
       JsoxTokenTypes.NUMBER -> KEYS_NUMBER
       JsoxTokenTypes.TAG -> KEYS_TAG
+      JsoxTokenTypes.SELECTOR_BRACKET -> KEYS_SELECTOR_BRACKET
       JsoxTokenTypes.PROPERTY -> KEYS_PROPERTY
       JsoxTokenTypes.IDENT -> KEYS_IDENT
       else -> TextAttributesKey.EMPTY_ARRAY
@@ -27,6 +28,12 @@ class JsoxSyntaxHighlighter : SyntaxHighlighterBase() {
     private val KEYS_COMMENT = arrayOf(DefaultLanguageHighlighterColors.LINE_COMMENT)
     private val KEYS_NUMBER = arrayOf(DefaultLanguageHighlighterColors.NUMBER)
     private val KEYS_TAG = arrayOf(DefaultLanguageHighlighterColors.METADATA)
+    private val KEYS_SELECTOR_BRACKET = arrayOf(
+      TextAttributesKey.createTextAttributesKey(
+        "JSOX_SELECTOR_BRACKETS",
+        DefaultLanguageHighlighterColors.STRING,
+      ),
+    )
     private val KEYS_PROPERTY = arrayOf(DefaultLanguageHighlighterColors.INSTANCE_FIELD)
     private val KEYS_IDENT = arrayOf(DefaultLanguageHighlighterColors.IDENTIFIER)
   }
