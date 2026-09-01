@@ -16,8 +16,7 @@
     "@js-ox/todo": "*",
     "@js-ox/ui": "*",
     "@js-ox/web-components": "*",
-    "@js-ox/web-components-example": "*",
-    "navigo": "^8.11.1"
+    "@js-ox/web-components-example": "*"
   },
   "devDependencies": {
     "@js-ox/compiler": "*",
