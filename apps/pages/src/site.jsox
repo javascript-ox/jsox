@@ -26,7 +26,7 @@ function render(site) {
         .className = "nav-extra"
         .href = github
         .target = "_blank"
-        .rel = "noreferrer"
+        .rel = "noopener noreferrer"
         ["GitHub"]
       }
     }
