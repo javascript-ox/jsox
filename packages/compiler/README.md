@@ -49,4 +49,4 @@ Optional `jsox.config.js` in the project root can override:
 
 - `create(tag)`, which returns the JavaScript expression used to create a tag
 - `childMethods` (`append`, `push`, `add` by default)
-- `childHelperName` (`$child` by default); the compiler adds a numeric suffix if that name is already bound in the source
+- `childHelperName` (`$child` by default; must be a valid JavaScript identifier); the compiler adds a numeric suffix if that name is already bound in the source
