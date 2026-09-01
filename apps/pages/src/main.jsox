@@ -1,10 +1,12 @@
 import "@js-ox/ui/theme.css";
 import Navigo from "navigo";
+import { defineComponent } from "@js-ox/web-components";
 import { Hello } from "@js-ox/hello";
 import { Counter } from "@js-ox/counter";
 import { Todo } from "@js-ox/todo";
 import { Pojo } from "@js-ox/pojo";
 import { Rxjs } from "@js-ox/rxjs";
+import { WebComponents } from "@js-ox/web-components-example";
 import { QuickStart, Tutorial } from "./docs.jsox";
 
 const github = "https://github.com/javascript-ox/jsox";
@@ -59,6 +61,12 @@ const examples = [
     kicker: "05",
     title: "RxJS",
     blurb: "JSOX constructs the DOM. Streams own the updates — no render cycle in between.",
+  },
+  {
+    href: "#/web-components",
+    kicker: "06",
+    title: "Web Components",
+    blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
   },
 ];
 
@@ -222,7 +230,7 @@ function Home() {
     <section> {
       .className = "home-wrap"
       <p> { .className = "kicker"; ["Examples"] }
-      <h2> { .className = "section-title"; ["Five small apps, one dialect."] }
+      <h2> { .className = "section-title"; ["Six small apps, one dialect."] }
       <p> {
         .className = "section-lede"
         ["Each example is a real page. DOM widgets, a plain-object album, streams that update nodes JSOX already constructed."]
@@ -279,66 +287,91 @@ function Missing() {
   }
 }
 
-const outlet = document.createElement("div");
-outlet.className = "outlet";
-
-function mount(view) {
-  outlet.replaceChildren();
-  const node = view();
-  if (node != null) outlet.append(node);
-}
-
-const router = new Navigo("/", { hash: true });
-router
-  .on("/", () => mount(Home))
-  .on("/start", () => mount(QuickStart))
-  .on("/tutorial", () => mount(Tutorial))
-  .on("/hello", () => mount(Hello))
-  .on("/counter", () => mount(Counter))
-  .on("/todo", () => mount(Todo))
-  .on("/pojo", () => mount(Pojo))
-  .on("/rxjs", () => mount(Rxjs))
-  .notFound(() => mount(Missing));
-
-function markActive() {
-  const here = location.hash || "#/";
-  document.body.classList.toggle("is-home", here === "#/" || here === "");
-  for (const a of document.querySelectorAll(".site-nav a[href^='#']")) {
-    a.classList.toggle("is-active", a.getAttribute("href") === here);
+function registerPage(tagName, view) {
+  [defineComponent(tagName)] {
+    .connected = function () {
+      if (!this.hasChildNodes()) this.append(view())
+    }
+    .register()
   }
 }
 
-window.addEventListener("hashchange", markActive);
+registerPage("jsox-home-page", Home);
+registerPage("jsox-start-page", QuickStart);
+registerPage("jsox-tutorial-page", Tutorial);
+registerPage("jsox-hello-page", Hello);
+registerPage("jsox-counter-page", Counter);
+registerPage("jsox-todo-page", Todo);
+registerPage("jsox-pojo-page", Pojo);
+registerPage("jsox-rxjs-page", Rxjs);
+registerPage("jsox-web-components-page", WebComponents);
+registerPage("jsox-missing-page", Missing);
 
-const chrome = <div> {
-  <header> {
-    .className = "site-nav"
-    <a> { .className = "brand"; .href = "#/"; ["JSOX"] }
-    <a> { .href = "#/start"; ["Quick Start"] }
-    <a> { .href = "#/tutorial"; ["Basic Tutorial"] }
-    <a> {
-      .className = "nav-extra"
-      .href = github
-      .target = "_blank"
-      .rel = "noreferrer"
-      ["GitHub"]
+const siteState = new WeakMap();
+
+[defineComponent("jsox-site")] {
+  .template = <div> {
+    <header> {
+      .className = "site-nav"
+      <a> { .className = "brand"; .href = "#/"; ["JSOX"] }
+      <a> { .href = "#/start"; ["Quick Start"] }
+      <a> { .href = "#/tutorial"; ["Basic Tutorial"] }
+      <a> {
+        .className = "nav-extra"
+        .href = github
+        .target = "_blank"
+        .rel = "noreferrer"
+        ["GitHub"]
+      }
+    }
+    <div> { .className = "outlet" }
+    <footer> {
+      .className = "site-foot"
+      <p> {
+        ["JSOX — JavaScript Object eXtensions. A compile-time dialect for constructing objects."]
+      }
+      <p> {
+        <a> { .href = github; .target = "_blank"; .rel = "noreferrer"; ["github.com/javascript-ox/jsox"] }
+      }
     }
   }
-  [outlet]
-  <footer> {
-    .className = "site-foot"
-    <p> {
-      ["JSOX — JavaScript Object eXtensions. A compile-time dialect for constructing objects."]
+  .connected = function () {
+    if (siteState.has(this)) return
+    const outlet = this.querySelector(".outlet")
+    const mount = (tagName) => outlet.replaceChildren(document.createElement(tagName))
+    const markActive = () => {
+      const here = location.hash || "#/"
+      document.body.classList.toggle("is-home", here === "#/" || here === "")
+      for (const link of Array.from(this.querySelectorAll(".site-nav a[href^='#']"))) {
+        link.classList.toggle("is-active", link.getAttribute("href") === here)
+      }
     }
-    <p> {
-      <a> { .href = github; .target = "_blank"; .rel = "noreferrer"; ["github.com/javascript-ox/jsox"] }
-    }
+    const router = new Navigo("/", { hash: true })
+    router.on("/", () => mount("jsox-home-page"))
+    router.on("/start", () => mount("jsox-start-page"))
+    router.on("/tutorial", () => mount("jsox-tutorial-page"))
+    router.on("/hello", () => mount("jsox-hello-page"))
+    router.on("/counter", () => mount("jsox-counter-page"))
+    router.on("/todo", () => mount("jsox-todo-page"))
+    router.on("/pojo", () => mount("jsox-pojo-page"))
+    router.on("/rxjs", () => mount("jsox-rxjs-page"))
+    router.on("/web-components", () => mount("jsox-web-components-page"))
+    router.notFound(() => mount("jsox-missing-page"))
+    window.addEventListener("hashchange", markActive)
+    siteState.set(this, { router, markActive })
+    router.resolve()
+    markActive()
   }
+  .disconnected = function () {
+    const state = siteState.get(this)
+    if (!state) return
+    window.removeEventListener("hashchange", state.markActive)
+    state.router.destroy()
+    siteState.delete(this)
+  }
+  .register()
 }
 
 [document.body] {
-  [chrome]
+  <jsox-site>
 }
-
-router.resolve();
-markActive();

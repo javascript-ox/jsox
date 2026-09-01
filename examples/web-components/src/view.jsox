@@ -1,0 +1,83 @@
+import "@js-ox/ui/theme.css";
+import { defineComponent } from "@js-ox/web-components";
+
+const componentState = new WeakMap();
+
+[defineComponent("jsox-click-counter")] {
+  .template = <section> {
+    .className = "panel"
+    <h2> { ["Native custom element"] }
+    <div> {
+      .className = "face"
+      <button> {
+        .type = "button"
+        .className = "btn btn-round decrease"
+        .setAttribute("aria-label", "Decrease")
+        ["−"]
+      }
+      <span> { .className = "count"; ["0"] }
+      <button> {
+        .type = "button"
+        .className = "btn btn-round increase"
+        .setAttribute("aria-label", "Increase")
+        ["+"]
+      }
+    }
+    <p> {
+      .className = "hint"
+      ["The template is cloned once; connectedCallback wires native DOM events."]
+    }
+  }
+  .connected = function () {
+    let state = componentState.get(this)
+    if (!state) {
+      state = { count: 0 }
+      componentState.set(this, state)
+    }
+    const value = this.querySelector(".count")
+    const decrease = this.querySelector(".decrease")
+    const increase = this.querySelector(".increase")
+    const update = (delta) => {
+      state.count += delta
+      value.textContent = String(state.count)
+    }
+    state.decrease = () => update(-1)
+    state.increase = () => update(1)
+    decrease.addEventListener("click", state.decrease)
+    increase.addEventListener("click", state.increase)
+  }
+  .disconnected = function () {
+    const state = componentState.get(this)
+    if (!state) return
+    this.querySelector(".decrease").removeEventListener("click", state.decrease)
+    this.querySelector(".increase").removeEventListener("click", state.increase)
+  }
+  .register()
+}
+
+const source = `[defineComponent("jsox-click-counter")] {
+  .template = <section> { ... }
+  .connected = function () {
+    // Wire the cloned native DOM.
+  }
+  .disconnected = function () { ... }
+  .register()
+}`;
+
+export function WebComponents() {
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Web Components"] }
+    <h1> { ["A component, not a framework"] }
+    <p> {
+      .className = "lede"
+      ["JSOX configures a native custom-element definition. The browser owns registration, lifecycle, attributes, and the resulting HTMLElement."]
+    }
+    <jsox-click-counter>
+    <section> {
+      .className = "panel"
+      <h2> { ["Definition"] }
+      <pre> { .className = "code"; [source] }
+    }
+  }
+}

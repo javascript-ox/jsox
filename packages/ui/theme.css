@@ -18,6 +18,11 @@ body {
   color: var(--ink);
 }
 
+jsox-site,
+.outlet > * {
+  display: block;
+}
+
 .wrap {
   max-width: 58rem;
   margin: 0 auto;

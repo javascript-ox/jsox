@@ -1,23 +1,19 @@
 {
-  "name": "@js-ox/pages",
+  "name": "@js-ox/web-components-example",
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "exports": {
+    ".": "./src/view.jsox"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@js-ox/counter": "*",
-    "@js-ox/hello": "*",
-    "@js-ox/pojo": "*",
-    "@js-ox/rxjs": "*",
-    "@js-ox/todo": "*",
     "@js-ox/ui": "*",
-    "@js-ox/web-components": "*",
-    "@js-ox/web-components-example": "*",
-    "navigo": "^8.11.1"
+    "@js-ox/web-components": "*"
   },
   "devDependencies": {
     "@js-ox/compiler": "*",
