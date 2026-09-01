@@ -118,7 +118,8 @@ function shiftMaps(maps, genDelta) {
 
 function tryTag(tokens, i, opts) {
   if (tokens[i]?.value !== "<") return null;
-  let j = skipWs(tokens, i + 1);
+  // Keep tag delimiters contiguous so `< b >` remains a JS comparison.
+  let j = i + 1;
   if (!isIdent(tokens[j])) return null;
   let name = tokens[j].value;
   j++;
@@ -126,7 +127,6 @@ function tryTag(tokens, i, opts) {
     name += "-" + tokens[j + 1].value;
     j += 2;
   }
-  j = skipWs(tokens, j);
   if (tokens[j]?.value !== ">") return null;
   j++;
   const k = skipWs(tokens, j);
