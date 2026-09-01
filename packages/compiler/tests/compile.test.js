@@ -148,6 +148,24 @@ describe("compile: arrays vs captures", () => {
   });
 });
 
+describe("compile: internal IR names", () => {
+  it("allows internal names in string literals", () => {
+    const code = js(`console.log("${EL}", "${SCOPE}");`);
+    assert.match(code, new RegExp(JSON.stringify(EL)));
+    assert.match(code, new RegExp(JSON.stringify(SCOPE)));
+  });
+
+  it("allows internal names inside ordinary identifiers", () => {
+    const code = js(`const value_${EL} = 1; const value_${SCOPE} = 2;`);
+    assert.match(code, new RegExp(`value_${EL}`));
+    assert.match(code, new RegExp(`value_${SCOPE}`));
+  });
+
+  it("allows internal names in comments", () => {
+    assert.doesNotThrow(() => js(`// ${EL}\n/* ${SCOPE} */\nconst ok = true;`));
+  });
+});
+
 describe("compile: POJO trees", () => {
   it("builds a nested object via add()", () => {
     const { code } = compile(`
@@ -174,4 +192,3 @@ globalThis.__album = album;
     assert.deepEqual(g.__album.tracks, [{ title: "Wire" }, { title: "Salt" }]);
   });
 });
-
