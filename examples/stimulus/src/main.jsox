@@ -1,0 +1,3 @@
+import { StimulusExample } from "./view.jsox";
+
+[document.body] { [StimulusExample()] }

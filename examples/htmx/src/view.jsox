@@ -1,0 +1,28 @@
+import "@js-ox/ui/theme.css";
+import htmx from "htmx.org";
+
+export function HtmxExample() {
+  const resultId = `htmx-result-${crypto.randomUUID()}`;
+  const result = <div> {
+    .id = resultId
+    .className = "htmx-result"
+    <p> { .className = "hint"; ["The server fragment will be swapped here."] }
+  }
+  const load = <button> {
+    .type = "button"
+    .className = "btn btn-accent"
+    .setAttribute("hx-get", new URL("fragments/htmx-greeting.html", document.baseURI).href)
+    .setAttribute("hx-target", `#${resultId}`)
+    .setAttribute("hx-swap", "innerHTML transition:true")
+    ["Request HTML fragment"]
+  }
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["HTMX"] }
+    <h1> { ["Hypermedia attributes, constructed in place."] }
+    <p> { .className = "lede"; ["JSOX constructs and configures the request element. HTMX fetches server-produced HTML and swaps it into the selected target."] }
+    <section> { .className = "panel htmx-demo"; [load]; [result] }
+  }
+  queueMicrotask(() => htmx.process(root));
+  return root;
+}

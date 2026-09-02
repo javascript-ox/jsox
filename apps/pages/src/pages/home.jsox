@@ -97,6 +97,27 @@ const integrationExamples = [
     title: "D3",
     blurb: "JSOX constructs SVG nodes while D3 scales translate data into visual dimensions.",
   },
+  {
+    href: "#/htmx",
+    mark: "hx",
+    markClass: "integration-mark-htmx",
+    title: "HTMX",
+    blurb: "JSOX configures hypermedia attributes; HTMX requests HTML and owns the resulting swap.",
+  },
+  {
+    href: "#/stimulus",
+    mark: "S",
+    markClass: "integration-mark-stimulus",
+    title: "Stimulus",
+    blurb: "Controller scopes, targets, and actions attach focused behavior to JSOX-built markup.",
+  },
+  {
+    href: "#/three",
+    mark: "3D",
+    markClass: "integration-mark-three",
+    title: "Three.js",
+    blurb: "JSOX constructs an actual scene graph of meshes and lights, then Three.js renders it.",
+  },
 ];
 
 const pillars = [

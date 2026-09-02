@@ -416,6 +416,31 @@ pre.code {
 .integration-mark-zod { background: #2563eb; }
 .integration-mark-gsap { background: #0b5d45; }
 .integration-mark-d3 { background: #ef6c35; }
+.integration-mark-htmx { background: #3366cc; }
+.integration-mark-stimulus { background: #77e8b9; color: #173b2c; }
+.integration-mark-three { background: #111; }
+
+.htmx-demo { display: grid; gap: 1rem; }
+
+.htmx-result {
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.fragment-card { width: 100%; }
+.fragment-card h2 { font-size: 1.2rem; color: var(--ink); text-transform: none; letter-spacing: -0.02em; }
+
+.stimulus-demo { display: grid; gap: 1rem; }
+.stimulus-demo label { display: grid; gap: 0.4rem; font-weight: 650; }
+.stimulus-output { min-height: 1.5em; margin: 0; color: var(--accent); font-weight: 650; }
+
+.three-stage { padding: 0; overflow: hidden; background: #1b1814; }
+.three-canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.three-source { margin-top: 1rem; }
 
 .machine-demo {
   display: flex;

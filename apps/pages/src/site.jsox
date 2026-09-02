@@ -12,13 +12,22 @@ function render(site) {
   const channelUrl = new URL(isDevelopment ? "../" : "develop/", document.baseURI);
   channelUrl.hash = `#${path}`;
   channelSwitch.href = channelUrl.href;
-  outlet.replaceChildren(document.createElement(resolveRoute(path)));
+  const state = siteState.get(site);
+  const renderId = ++state.renderId;
+  outlet.replaceChildren();
   document.body.classList.toggle("is-home", path === "/");
   document.body.classList.toggle("is-development", isDevelopment);
 
   for (const link of site.querySelectorAll(".site-nav a[href^='#']")) {
     link.classList.toggle("is-active", link.getAttribute("href") === `#${path}`);
   }
+
+  resolveRoute(path)().then((view) => {
+    if (state.renderId === renderId) outlet.replaceChildren(view);
+  }).catch((error) => {
+    console.error("Unable to load route", error);
+    if (state.renderId === renderId) outlet.textContent = "Unable to load this page.";
+  });
 }
 
 [defineComponent("jsox-site")] {
@@ -56,14 +65,14 @@ function render(site) {
   .connected = function () {
     if (siteState.has(this)) return
     const onHashChange = () => render(this)
-    siteState.set(this, onHashChange)
+    siteState.set(this, { onHashChange, renderId: 0 })
     window.addEventListener("hashchange", onHashChange)
     render(this)
   }
   .disconnected = function () {
-    const onHashChange = siteState.get(this)
-    if (!onHashChange) return
-    window.removeEventListener("hashchange", onHashChange)
+    const state = siteState.get(this)
+    if (!state) return
+    window.removeEventListener("hashchange", state.onHashChange)
     siteState.delete(this)
   }
   .register()
