@@ -69,6 +69,34 @@ const integrationExamples = [
     title: "Effect",
     blurb: "Effects own retries, typed failures, cancellation, and cleanup while JSOX owns the concrete view.",
   },
+  {
+    href: "#/xstate",
+    mark: "X",
+    markClass: "integration-mark-xstate",
+    title: "XState",
+    blurb: "A state-machine actor owns valid transitions while JSOX owns the concrete controls and indicators.",
+  },
+  {
+    href: "#/zod",
+    mark: "Z",
+    markClass: "integration-mark-zod",
+    title: "Zod",
+    blurb: "Native form values cross a schema boundary and return typed data or precise validation issues.",
+  },
+  {
+    href: "#/gsap",
+    mark: "G",
+    markClass: "integration-mark-gsap",
+    title: "GSAP",
+    blurb: "Captured DOM references go straight into a timeline—no renderer adapter or element lookup required.",
+  },
+  {
+    href: "#/d3",
+    mark: "D3",
+    markClass: "integration-mark-d3",
+    title: "D3",
+    blurb: "JSOX constructs SVG nodes while D3 scales translate data into visual dimensions.",
+  },
 ];
 
 const pillars = [

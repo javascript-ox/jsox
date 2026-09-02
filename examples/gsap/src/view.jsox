@@ -1,0 +1,45 @@
+import "@js-ox/ui/theme.css";
+import { gsap } from "gsap";
+
+export function GsapExample() {
+  const words = ["Create", "Configure", "Compose"];
+  const cards = words.map((word, index) => <li> {
+    .className = "motion-card"
+    <span> { .className = "kicker"; [`0${index + 1}`] }
+    <strong> { [word] }
+  });
+  const replay = <button> { .type = "button"; .className = "btn btn-accent"; ["Replay animation"] }
+  let timeline = null;
+  const animate = () => {
+    timeline?.kill();
+    timeline = gsap.timeline()
+      .set(cards, { opacity: 0, y: 36, rotate: -3 })
+      .to(cards, { opacity: 1, y: 0, rotate: 0, duration: 0.55, stagger: 0.14, ease: "back.out(1.7)" });
+  };
+  replay.addEventListener("click", animate);
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["GSAP"] }
+    <h1> { ["Animate the nodes you constructed."] }
+    <p> { .className = "lede"; ["JSOX returns concrete element references. GSAP can animate them directly—no adapter or render cycle required."] }
+    <section> {
+      .className = "panel motion-demo"
+      <ul> { .className = "motion-stage"; for (const card of cards) { [card] } }
+      [replay]
+    }
+  }
+
+  queueMicrotask(animate);
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      replay.removeEventListener("click", animate);
+      timeline?.kill();
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+  return root;
+}

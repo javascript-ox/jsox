@@ -412,6 +412,61 @@ pre.code {
 .integration-mark-web { background: #1b1814; }
 .integration-mark-rxjs { background: #d81b60; }
 .integration-mark-effect { background: #6e56cf; }
+.integration-mark-xstate { background: #111827; }
+.integration-mark-zod { background: #2563eb; }
+.integration-mark-gsap { background: #0b5d45; }
+.integration-mark-d3 { background: #ef6c35; }
+
+.machine-demo {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.traffic-stack {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.8rem;
+  border-radius: 1rem;
+  background: #25211d;
+}
+
+.traffic-light {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: #4a443d;
+  opacity: 0.32;
+}
+
+.traffic-light.is-active { opacity: 1; box-shadow: 0 0 1.2rem currentColor; }
+.traffic-light-red.is-active { background: #e5484d; color: #e5484d; }
+.traffic-light-yellow.is-active { background: #f5d90a; color: #f5d90a; }
+.traffic-light-green.is-active { background: #30a46c; color: #30a46c; }
+.machine-state { display: block; margin: 0 0 1rem; font-size: 2rem; text-transform: capitalize; }
+
+.validation-form { display: grid; gap: 1rem; }
+.validation-form label { display: grid; gap: 0.35rem; font-weight: 650; }
+.validation-form input { border: 1px solid var(--line); border-radius: 0.65rem; padding: 0.7rem 0.8rem; font: inherit; }
+.field-error { min-height: 1.2em; color: #b42318; font-size: 0.85rem; font-weight: 400; }
+.validation-result { margin: 1rem 0 0; color: var(--muted); }
+.validation-result.is-valid { color: #18794e; }
+.validation-result.is-invalid { color: #b42318; }
+
+.motion-demo { display: grid; gap: 1.25rem; }
+.motion-stage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0; padding: 1rem 0; list-style: none; overflow: hidden; }
+.motion-card { display: grid; gap: 0.25rem; min-height: 8rem; align-content: end; padding: 1rem; border-radius: 0.85rem; background: var(--ink); color: var(--paper); }
+.motion-card strong { font-size: clamp(1rem, 3vw, 1.5rem); }
+
+.chart-demo { display: grid; gap: 1rem; }
+.bar-chart { display: block; width: 100%; height: auto; }
+.bar-chart rect { fill: var(--accent); }
+.bar-chart text { fill: var(--muted); font: 14px ui-sans-serif, system-ui, sans-serif; text-anchor: middle; }
+
+@media (max-width: 36rem) {
+  .machine-demo { align-items: flex-start; }
+  .motion-stage { grid-template-columns: 1fr; }
+}
 
 .hero {
   background: var(--ink);

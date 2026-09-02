@@ -1,0 +1,3 @@
+import { GsapExample } from "./view.jsox";
+
+[document.body] { [GsapExample()] }

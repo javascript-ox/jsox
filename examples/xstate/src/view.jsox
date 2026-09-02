@@ -1,0 +1,61 @@
+import "@js-ox/ui/theme.css";
+import { createActor, createMachine } from "xstate";
+
+const trafficLight = createMachine({
+  id: "traffic-light",
+  initial: "red",
+  states: {
+    red: { on: { NEXT: "green" } },
+    green: { on: { NEXT: "yellow" } },
+    yellow: { on: { NEXT: "red" } },
+  },
+});
+
+export function XStateExample() {
+  const stateName = <strong> { .className = "machine-state"; ["red"] }
+  const lights = ["red", "yellow", "green"].map((color) => <span> {
+    .className = `traffic-light traffic-light-${color}`
+    .setAttribute("aria-label", color)
+  });
+  const next = <button> { .type = "button"; .className = "btn btn-accent"; ["Send NEXT"] }
+  const actor = createActor(trafficLight);
+  const subscription = actor.subscribe((snapshot) => {
+    stateName.textContent = snapshot.value;
+    for (const light of lights) {
+      light.classList.toggle("is-active", light.getAttribute("aria-label") === snapshot.value);
+    }
+  });
+  const advance = () => actor.send({ type: "NEXT" });
+  next.addEventListener("click", advance);
+  actor.start();
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["XState"] }
+    <h1> { ["State machines, ordinary elements."] }
+    <p> { .className = "lede"; ["JSOX constructs the lights and controls. An XState actor owns every valid transition."] }
+    <section> {
+      .className = "panel machine-demo"
+      <div> { .className = "traffic-stack"; for (const light of lights) { [light] } }
+      <div> {
+        <p> { .className = "hint"; ["Current state"] }
+        [stateName]
+        <p> { .className = "hint"; ["red → green → yellow → red"] }
+        [next]
+      }
+    }
+  }
+
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      next.removeEventListener("click", advance);
+      subscription.unsubscribe();
+      actor.stop();
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+  return root;
+}
