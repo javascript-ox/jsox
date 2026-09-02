@@ -2,47 +2,60 @@ import "@js-ox/ui/theme.css";
 import * as THREE from "three";
 
 const sceneSource = `const scene = new THREE.Scene()
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(1.4, 1.4, 1.4),
-  new THREE.MeshStandardMaterial({ color: 0xe8793a, roughness: 0.38 })
-)
+const cube = new THREE.Mesh()
+const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 100)
+const hemisphere = new THREE.HemisphereLight()
 const keyLight = new THREE.DirectionalLight(0xffffff, 3)
 
 [scene] {
   .background = new THREE.Color(0x1b1814)
-  [cube]
-  [new THREE.HemisphereLight(0xfff4dc, 0x33251e, 2.2)]
+  [cube] {
+    .geometry = new THREE.BoxGeometry(1.4, 1.4, 1.4)
+    .material = new THREE.MeshStandardMaterial({
+      color: 0xe8793a,
+      roughness: 0.38,
+    })
+    .rotation.set(0.35, 0.55, 0)
+  }
+  [camera] { .position.set(0, 0, 4.5) }
+  [hemisphere] {
+    .color.setHex(0xfff4dc)
+    .groundColor.setHex(0x33251e)
+    .intensity = 2.2
+  }
   [keyLight] { .position.set(3, 4, 5) }
-}
-
-[cube] {
-  .rotation.x = 0.35
-  .rotation.y = 0.55
 }`;
 
 export function ThreeExample() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 100);
-  const geometry = new THREE.BoxGeometry(1.4, 1.4, 1.4);
-  const material = new THREE.MeshStandardMaterial({ color: 0xe8793a, roughness: 0.38 });
-  const cube = new THREE.Mesh(geometry, material);
+  const cube = new THREE.Mesh();
+  const hemisphere = new THREE.HemisphereLight();
   const keyLight = new THREE.DirectionalLight(0xffffff, 3);
   [scene] {
     .background = new THREE.Color(0x1b1814)
-    [cube]
-    [new THREE.HemisphereLight(0xfff4dc, 0x33251e, 2.2)]
+    [cube] {
+      .geometry = new THREE.BoxGeometry(1.4, 1.4, 1.4)
+      .material = new THREE.MeshStandardMaterial({ color: 0xe8793a, roughness: 0.38 })
+      .rotation.set(0.35, 0.55, 0)
+    }
+    [camera] { .position.set(0, 0, 4.5) }
+    [hemisphere] {
+      .color.setHex(0xfff4dc)
+      .groundColor.setHex(0x33251e)
+      .intensity = 2.2
+    }
     [keyLight] { .position.set(3, 4, 5) }
   }
-  [cube] {
-    .rotation.x = 0.35
-    .rotation.y = 0.55
-  }
-  camera.position.z = 4.5;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(640, 360, false);
-  renderer.domElement.className = "three-canvas";
+  const rendererOptions = {};
+  [rendererOptions] { .antialias = true }
+  const renderer = new THREE.WebGLRenderer(rendererOptions);
+  [renderer] {
+    .setPixelRatio(Math.min(devicePixelRatio, 2))
+    .setSize(640, 360, false)
+    .domElement.className = "three-canvas"
+  }
 
   let frame = 0;
   const animate = () => {
@@ -72,8 +85,8 @@ export function ThreeExample() {
     new MutationObserver((_, observer) => {
       if (root.isConnected) return;
       cancelAnimationFrame(frame);
-      geometry.dispose();
-      material.dispose();
+      cube.geometry.dispose();
+      cube.material.dispose();
       renderer.dispose();
       observer.disconnect();
     }).observe(parent, { childList: true });

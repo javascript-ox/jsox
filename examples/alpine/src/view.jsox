@@ -1,0 +1,40 @@
+import "@js-ox/ui/theme.css";
+import Alpine from "alpinejs";
+
+export function AlpineExample() {
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Alpine.js"] }
+    <h1> { ["Declarative behavior on constructed markup."] }
+    <p> { .className = "lede"; ["JSOX constructs the complete subtree and its Alpine directives. Alpine adds local state and behavior after the subtree is mounted."] }
+    <section> {
+      .className = "panel alpine-demo"
+      .setAttribute("x-data", "{ count: 0, step: 1 }")
+      <label> {
+        ["Step"]
+        <input> {
+          .type = "range"
+          .min = "1"
+          .max = "5"
+          .setAttribute("x-model.number", "step")
+        }
+      }
+      <p> {
+        .className = "alpine-count"
+        <span> { .setAttribute("x-text", "count"); ["0"] }
+      }
+      <div> {
+        .className = "button-row"
+        <button> { .type = "button"; .className = "btn"; .setAttribute("x-on:click", "count -= step"); ["Decrease"] }
+        <button> { .type = "button"; .className = "btn btn-accent"; .setAttribute("x-on:click", "count += step"); ["Increase"] }
+      }
+      <p> { .className = "hint"; .setAttribute("x-text", "`Changing by ${step} at a time`"); ["Changing by 1 at a time"] }
+    }
+  }
+
+  requestAnimationFrame(() => {
+    if (root.isConnected) Alpine.initTree(root);
+  });
+  root.addEventListener("jsox:dispose", () => Alpine.destroyTree(root), { once: true });
+  return root;
+}

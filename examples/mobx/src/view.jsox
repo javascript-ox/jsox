@@ -1,0 +1,42 @@
+import "@js-ox/ui/theme.css";
+import { autorun, observable, runInAction } from "mobx";
+
+export function MobxExample() {
+  const model = { count: 0, changes: 0 };
+  [model] {
+    .increment = function (delta) {
+      runInAction(() => {
+        this.count += delta;
+        this.changes += 1;
+      });
+    }
+  }
+  const state = observable(model);
+  const count = <strong> { .className = "mobx-count"; ["0"] }
+  const summary = <p> { .className = "hint"; ["No changes yet."] }
+  const decrease = <button> { .type = "button"; .className = "btn"; ["−1"] }
+  const increase = <button> { .type = "button"; .className = "btn btn-accent"; ["+1"] }
+
+  const dispose = autorun(() => {
+    count.textContent = String(state.count);
+    summary.textContent = `${state.changes} observable change${state.changes === 1 ? "" : "s"}`;
+  });
+  decrease.onclick = () => state.increment(-1);
+  increase.onclick = () => state.increment(1);
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["MobX"] }
+    <h1> { ["Observable objects, concrete updates."] }
+    <p> { .className = "lede"; ["JSOX configures the model and constructs the view. MobX observes the object and reactions update the captured nodes directly."] }
+    <section> {
+      .className = "panel mobx-demo"
+      [count]
+      <div> { .className = "button-row"; [decrease]; [increase] }
+      [summary]
+    }
+  }
+
+  root.addEventListener("jsox:dispose", dispose, { once: true });
+  return root;
+}

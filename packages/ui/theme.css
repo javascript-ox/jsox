@@ -419,6 +419,51 @@ pre.code {
 .integration-mark-htmx { background: #3366cc; }
 .integration-mark-stimulus { background: #77e8b9; color: #173b2c; }
 .integration-mark-three { background: #111; }
+.integration-mark-alpine { background: #77c1d2; color: #102f36; }
+.integration-mark-mobx { background: #ea6618; }
+.integration-mark-chartjs { background: #ff6384; }
+.integration-mark-tanstack { background: #ef4444; }
+.integration-mark-sortable { background: #5b5bd6; }
+
+.button-row { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; }
+
+.alpine-demo,
+.mobx-demo,
+.query-demo,
+.sortable-demo { display: grid; gap: 1rem; }
+
+.alpine-demo label { display: grid; gap: 0.45rem; font-weight: 650; }
+.alpine-count,
+.mobx-count,
+.query-status { margin: 0; color: var(--accent); font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1; }
+
+.chartjs-demo { display: grid; gap: 1rem; }
+.chartjs-stage { position: relative; min-height: 24rem; }
+
+.query-details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.45rem 1rem;
+  margin: 0;
+}
+.query-details dt { color: var(--muted); font-weight: 650; }
+.query-details dd { margin: 0; }
+
+.sortable-list { display: grid; gap: 0.55rem; margin: 0; padding: 0; list-style: none; }
+.sortable-item {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--paper);
+}
+.drag-handle { cursor: grab; color: var(--accent); font-size: 1.35rem; touch-action: none; }
+.sortable-number { color: var(--muted); font-variant-numeric: tabular-nums; }
+.sortable-item.is-dragging { opacity: 0.45; }
+.sortable-order { overflow-wrap: anywhere; }
 
 .htmx-demo { display: grid; gap: 1rem; }
 

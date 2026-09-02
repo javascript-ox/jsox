@@ -5,6 +5,13 @@ const github = "https://github.com/javascript-ox/jsox";
 const isDevelopment = import.meta.env.VITE_JSOX_CHANNEL === "develop";
 const siteState = new WeakMap();
 
+function replaceOutlet(outlet, ...children) {
+  for (const child of outlet.children) {
+    child.dispatchEvent(new CustomEvent("jsox:dispose"));
+  }
+  outlet.replaceChildren(...children);
+}
+
 function render(site) {
   const path = currentPath();
   const outlet = site.querySelector(".outlet");
@@ -14,7 +21,7 @@ function render(site) {
   channelSwitch.href = channelUrl.href;
   const state = siteState.get(site);
   const renderId = ++state.renderId;
-  outlet.replaceChildren();
+  replaceOutlet(outlet);
   document.body.classList.toggle("is-home", path === "/");
   document.body.classList.toggle("is-development", isDevelopment);
 
@@ -23,7 +30,7 @@ function render(site) {
   }
 
   resolveRoute(path)().then((view) => {
-    if (state.renderId === renderId) outlet.replaceChildren(view);
+    if (state.renderId === renderId) replaceOutlet(outlet, view);
   }).catch((error) => {
     console.error("Unable to load route", error);
     if (state.renderId === renderId) outlet.textContent = "Unable to load this page.";

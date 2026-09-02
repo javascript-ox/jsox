@@ -76,9 +76,30 @@ const libraryIntegrations = [
     title: "Zod",
     blurb: "Native form values cross a schema boundary and return typed data or precise validation issues.",
   },
+  {
+    href: "#/mobx",
+    mark: "M",
+    markClass: "integration-mark-mobx",
+    title: "MobX",
+    blurb: "Observable object state drives direct updates to the concrete nodes JSOX constructed.",
+  },
+  {
+    href: "#/tanstack",
+    mark: "TQ",
+    markClass: "integration-mark-tanstack",
+    title: "TanStack Query",
+    blurb: "Framework-agnostic query core owns caching and freshness around a JSOX-built result view.",
+  },
 ];
 
 const frontendIntegrations = [
+  {
+    href: "#/alpine",
+    mark: "A",
+    markClass: "integration-mark-alpine",
+    title: "Alpine.js",
+    blurb: "JSOX constructs a directive-rich subtree; Alpine adds local state and declarative behavior.",
+  },
   {
     href: "#/web-components",
     mark: "<>",
@@ -120,6 +141,20 @@ const frontendIntegrations = [
     markClass: "integration-mark-three",
     title: "Three.js",
     blurb: "JSOX constructs an actual scene graph of meshes and lights, then Three.js renders it.",
+  },
+  {
+    href: "#/chartjs",
+    mark: "C",
+    markClass: "integration-mark-chartjs",
+    title: "Chart.js",
+    blurb: "JSOX builds both the canvas and deeply nested configuration graph that Chart.js renders.",
+  },
+  {
+    href: "#/sortable",
+    mark: "↕",
+    markClass: "integration-mark-sortable",
+    title: "SortableJS",
+    blurb: "A JSOX-built list gains drag-and-drop ordering without surrendering ownership of its nodes.",
   },
 ];
 
