@@ -1,0 +1,43 @@
+import "@js-ox/ui/theme.css";
+import { Button, Card } from "./ui.jsox";
+
+const componentSource = `export function Card({ title, description, content, actions = [] }) {
+  return <article> {
+    .className = "shadcn-card"
+    <header> {
+      <h2> { [title] }
+      <p> { [description] }
+    }
+    <div> { [content] }
+    <footer> { for (const action of actions) [action] }
+  }
+}`;
+
+export function ShadcnExample() {
+  const message = <p> { .className = "shadcn-message"; ["Choose an action."] }
+  const card = Card({
+    title: "Deploy development",
+    description: "Promote the current integration gallery when it is ready.",
+    content: <div> {
+      .className = "shadcn-summary"
+      <span> { ["Branch"] }
+      <strong> { ["develop"] }
+      <span> { ["Examples"] }
+      <strong> { ["17 integrations"] }
+      [message]
+    },
+    actions: [
+      Button("Cancel", { variant: "outline", onclick: () => message.textContent = "Deployment cancelled." }),
+      Button("Deploy", { onclick: () => message.textContent = "Ready to deploy." }),
+    ],
+  });
+
+  return <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["shadcn/ui"] }
+    <h1> { ["Own the component source—in JSOX."] }
+    <p> { .className = "lede"; ["shadcn/ui distributes source rather than a runtime component package. This demo ports that ownership model to editable JSOX primitives built directly into DOM nodes."] }
+    <section> { .className = "shadcn-demo"; [card] }
+    <figure> { .className = "code-pane three-source"; <figcaption> { ["The local Card primitive"] }; <pre> { .className = "code"; [componentSource] } }
+  }
+}

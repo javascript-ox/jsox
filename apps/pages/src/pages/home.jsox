@@ -156,6 +156,20 @@ const frontendIntegrations = [
     title: "SortableJS",
     blurb: "A JSOX-built list gains drag-and-drop ordering without surrendering ownership of its nodes.",
   },
+  {
+    href: "#/tanstack-table",
+    mark: "TT",
+    markClass: "integration-mark-tanstack-table",
+    title: "TanStack Table",
+    blurb: "TanStack's headless UI model supplies sorting and rows while JSOX owns all table markup.",
+  },
+  {
+    href: "#/shadcn",
+    mark: "S",
+    markClass: "integration-mark-shadcn",
+    title: "shadcn/ui",
+    blurb: "Source-owned Card and Button primitives are expressed directly in JSOX instead of React.",
+  },
 ];
 
 const pillars = [

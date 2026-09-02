@@ -424,6 +424,8 @@ pre.code {
 .integration-mark-chartjs { background: #ff6384; }
 .integration-mark-tanstack { background: #ef4444; }
 .integration-mark-sortable { background: #5b5bd6; }
+.integration-mark-tanstack-table { background: linear-gradient(135deg, #00c7b7 50%, #ef4444 50%); }
+.integration-mark-shadcn { background: #09090b; }
 
 .button-row { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; }
 
@@ -464,6 +466,32 @@ pre.code {
 .sortable-number { color: var(--muted); font-variant-numeric: tabular-nums; }
 .sortable-item.is-dragging { opacity: 0.45; }
 .sortable-order { overflow-wrap: anywhere; }
+
+.table-scroll { overflow-x: auto; }
+.tanstack-table { width: 100%; border-collapse: collapse; }
+.tanstack-table th,
+.tanstack-table td { padding: 0.8rem; border-bottom: 1px solid var(--line); text-align: left; }
+.tanstack-table th button { border: 0; padding: 0; background: none; color: inherit; font: inherit; font-weight: 750; cursor: pointer; }
+.tanstack-table tbody tr:last-child td { border-bottom: 0; }
+
+.shadcn-demo { display: grid; place-items: center; padding: 1rem 0; }
+.shadcn-card { width: min(100%, 32rem); border: 1px solid var(--line); border-radius: 0.75rem; background: var(--paper); box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
+.shadcn-card-header,
+.shadcn-card-content,
+.shadcn-card-footer { padding: 1.5rem; }
+.shadcn-card-header { padding-bottom: 0.75rem; }
+.shadcn-card-content { padding-block: 0.75rem; }
+.shadcn-card-footer { display: flex; justify-content: flex-end; gap: 0.65rem; padding-top: 0.75rem; }
+.shadcn-card-title { margin: 0; font-size: 1.15rem; text-transform: none; letter-spacing: -0.02em; }
+.shadcn-card-description { margin: 0.35rem 0 0; color: var(--muted); }
+.shadcn-summary { display: grid; grid-template-columns: 1fr auto; gap: 0.55rem 1rem; }
+.shadcn-summary > span { color: var(--muted); }
+.shadcn-message { grid-column: 1 / -1; min-height: 1.5em; margin: 0.5rem 0 0; }
+.shadcn-button { border-radius: 0.45rem; border: 1px solid transparent; font: inherit; font-weight: 650; cursor: pointer; }
+.shadcn-button-md { min-height: 2.5rem; padding: 0.5rem 1rem; }
+.shadcn-button-sm { min-height: 2rem; padding: 0.3rem 0.75rem; }
+.shadcn-button-default { background: #18181b; color: #fafafa; }
+.shadcn-button-outline { border-color: var(--line); background: transparent; color: var(--ink); }
 
 .htmx-demo { display: grid; gap: 1rem; }
 
