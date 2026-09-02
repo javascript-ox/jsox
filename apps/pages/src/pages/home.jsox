@@ -47,14 +47,7 @@ const basicExamples = [
   },
 ];
 
-const integrationExamples = [
-  {
-    href: "#/web-components",
-    mark: "<>",
-    markClass: "integration-mark-web",
-    title: "Web Components",
-    blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
-  },
+const libraryIntegrations = [
   {
     href: "#/rxjs",
     mark: "Rx",
@@ -82,6 +75,16 @@ const integrationExamples = [
     markClass: "integration-mark-zod",
     title: "Zod",
     blurb: "Native form values cross a schema boundary and return typed data or precise validation issues.",
+  },
+];
+
+const frontendIntegrations = [
+  {
+    href: "#/web-components",
+    mark: "<>",
+    markClass: "integration-mark-web",
+    title: "Web Components",
+    blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
   },
   {
     href: "#/gsap",
@@ -302,15 +305,45 @@ export function Home() {
 
       <div> {
         .className = "examples-group"
-        <p> { .className = "kicker"; ["Integrations"] }
-        <h2> { .className = "section-title"; ["Bring the tools you already use."] }
+        <p> { .className = "kicker"; ["Library integrations"] }
+        <h2> { .className = "section-title"; ["Bring your application tools."] }
         <p> {
           .className = "section-lede"
-          ["JSOX handles construction. Browser standards and focused libraries can keep owning components, streams, effects, and application behavior."]
+          ["JSOX handles construction while focused libraries keep owning streams, effects, state machines, and validation."]
         }
         <ul> {
           .className = "grid integration-grid"
-          for (const integration of integrationExamples) {
+          for (const integration of libraryIntegrations) {
+            <li> {
+              <a> {
+                .className = "card integration-card"
+                .href = integration.href
+                <span> {
+                  .className = `integration-mark ${integration.markClass}`
+                  .setAttribute("aria-hidden", "true")
+                  [integration.mark]
+                }
+                <div> {
+                  <h2> { [integration.title] }
+                  <p> { [integration.blurb] }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      <div> {
+        .className = "examples-group"
+        <p> { .className = "kicker"; ["Frontend integrations"] }
+        <h2> { .className = "section-title"; ["Use the browser-facing tools you prefer."] }
+        <p> {
+          .className = "section-lede"
+          ["Native components and frontend libraries can own interaction, animation, visualization, and rendering around the objects JSOX constructs."]
+        }
+        <ul> {
+          .className = "grid integration-grid"
+          for (const integration of frontendIntegrations) {
             <li> {
               <a> {
                 .className = "card integration-card"

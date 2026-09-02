@@ -23,6 +23,8 @@ export function HtmxExample() {
     <p> { .className = "lede"; ["JSOX constructs and configures the request element. HTMX fetches server-produced HTML and swaps it into the selected target."] }
     <section> { .className = "panel htmx-demo"; [load]; [result] }
   }
-  queueMicrotask(() => htmx.process(root));
+  requestAnimationFrame(() => {
+    if (root.isConnected) htmx.process(root);
+  });
   return root;
 }
