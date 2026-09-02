@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import htmx from "htmx.org";
 
 export function HtmxExample() {
@@ -26,5 +28,5 @@ export function HtmxExample() {
   requestAnimationFrame(() => {
     if (root.isConnected) htmx.process(root);
   });
-  return root;
+  return withSource(root, source);
 }

@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import Sortable from "sortablejs";
 
 export function SortableExample() {
@@ -39,5 +41,5 @@ export function SortableExample() {
     <section> { .className = "panel sortable-demo"; [list]; [order] }
   }
   root.addEventListener("jsox:dispose", () => sortable.destroy(), { once: true });
-  return root;
+  return withSource(root, source);
 }

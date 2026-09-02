@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { autorun, observable, runInAction } from "mobx";
 
 export function MobxExample() {
@@ -38,5 +40,5 @@ export function MobxExample() {
   }
 
   root.addEventListener("jsox:dispose", dispose, { once: true });
-  return root;
+  return withSource(root, source);
 }

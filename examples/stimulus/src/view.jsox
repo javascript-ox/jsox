@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { Application, Controller } from "@hotwired/stimulus";
 
 class GreetingController extends Controller {
@@ -53,5 +55,5 @@ export function StimulusExample() {
       observer.disconnect();
     }).observe(parent, { childList: true });
   });
-  return root;
+  return withSource(root, source);
 }

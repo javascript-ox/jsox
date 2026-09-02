@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 
 export function Todo() {
   const list = <ul> {
@@ -36,7 +38,7 @@ export function Todo() {
     if (event.key === "Enter") addTask();
   });
 
-  return <main> {
+  const root = <main> {
     .className = "wrap"
     <p> { .className = "kicker"; ["Todo"] }
     <h1> { ["Tasks"] }
@@ -56,4 +58,5 @@ export function Todo() {
     }
     [list]
   }
+  return withSource(root, source);
 }

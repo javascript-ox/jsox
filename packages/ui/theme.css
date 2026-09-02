@@ -276,6 +276,19 @@ pre.code {
   overflow: auto;
 }
 
+.source-panel { margin-top: 1.25rem; }
+.source-panel > summary {
+  cursor: pointer;
+  padding: 0.85rem 1rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.source-panel[open] > summary { border-bottom: 1px solid var(--line); }
+.source-panel > pre { margin: 0; border: 0; border-radius: 0; }
+
 .facts {
   display: grid;
   gap: 0.35rem;

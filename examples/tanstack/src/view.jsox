@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
 
 const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -53,5 +55,5 @@ export function TanStackExample() {
     unsubscribe();
     client.clear();
   }, { once: true });
-  return root;
+  return withSource(root, source);
 }

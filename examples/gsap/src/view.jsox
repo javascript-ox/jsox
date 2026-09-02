@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { gsap } from "gsap";
 
 export function GsapExample() {
@@ -41,5 +43,5 @@ export function GsapExample() {
       observer.disconnect();
     }).observe(parent, { childList: true });
   });
-  return root;
+  return withSource(root, source);
 }

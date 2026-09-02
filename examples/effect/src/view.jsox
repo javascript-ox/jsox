@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { Effect, Fiber } from "effect";
 
 export function EffectExample() {
@@ -131,5 +133,5 @@ export function EffectExample() {
     }).observe(parent, { childList: true });
   });
 
-  return root;
+  return withSource(root, source);
 }

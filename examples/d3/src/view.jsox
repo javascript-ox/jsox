@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { scaleBand, scaleLinear } from "d3";
 
 const svgNode = (name) => document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -65,5 +67,5 @@ export function D3Example() {
       observer.disconnect();
     }).observe(parent, { childList: true });
   });
-  return root;
+  return withSource(root, source);
 }

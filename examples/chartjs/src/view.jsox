@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import Chart from "chart.js/auto";
 
 export function ChartJsExample() {
@@ -43,5 +45,5 @@ export function ChartJsExample() {
     <section> { .className = "panel chartjs-demo"; <div> { .className = "chartjs-stage"; [canvas] }; [randomize] }
   }
   root.addEventListener("jsox:dispose", () => chart.destroy(), { once: true });
-  return root;
+  return withSource(root, source);
 }

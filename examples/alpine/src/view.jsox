@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import Alpine from "alpinejs";
 
 export function AlpineExample() {
@@ -36,5 +38,5 @@ export function AlpineExample() {
     if (root.isConnected) Alpine.initTree(root);
   });
   root.addEventListener("jsox:dispose", () => Alpine.destroyTree(root), { once: true });
-  return root;
+  return withSource(root, source);
 }
