@@ -1,6 +1,7 @@
 import "@js-ox/ui/theme.css";
 import { Hello } from "@js-ox/hello";
 import { Counter } from "@js-ox/counter";
+import { EffectExample } from "@js-ox/effect";
 import { Todo } from "@js-ox/todo";
 import { Pojo } from "@js-ox/pojo";
 import { Rxjs } from "@js-ox/rxjs";
@@ -16,6 +17,7 @@ definePage("jsox-start-page", QuickStart);
 definePage("jsox-tutorial-page", Tutorial);
 definePage("jsox-hello-page", Hello);
 definePage("jsox-counter-page", Counter);
+definePage("jsox-effect-page", EffectExample);
 definePage("jsox-todo-page", Todo);
 definePage("jsox-pojo-page", Pojo);
 definePage("jsox-rxjs-page", Rxjs);

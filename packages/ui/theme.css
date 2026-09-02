@@ -295,6 +295,61 @@ pre.code {
   color: var(--muted);
 }
 
+.effect-demo {
+  display: grid;
+  gap: 1rem;
+}
+
+.effect-demo-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.effect-demo-head .hint {
+  display: block;
+  margin: 0 0 0.2rem;
+}
+
+.effect-demo-head .row {
+  margin: 0;
+}
+
+.effect-status {
+  font-size: 1.35rem;
+}
+
+.effect-log {
+  min-height: 10rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  overflow: hidden;
+}
+
+.effect-log:empty::after {
+  content: "Run the effect to see its structured lifecycle.";
+  display: block;
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.effect-log li {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.effect-log li:last-child { border-bottom: 0; }
+.effect-log-running { color: var(--muted); }
+.effect-log-error { color: #b42318; }
+.effect-log-success { color: #18794e; }
+
 .outlet {
   min-height: 60vh;
 }
@@ -323,6 +378,40 @@ pre.code {
 .home {
   padding-bottom: 0;
 }
+
+.examples-group {
+  margin-top: 4rem;
+  padding-top: 4rem;
+  border-top: 1px solid var(--line);
+}
+
+.integration-grid {
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.integration-card {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  align-items: start;
+  gap: 1rem;
+}
+
+.integration-mark {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.85rem;
+  color: white;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.1rem;
+  font-weight: 750;
+  letter-spacing: -0.06em;
+}
+
+.integration-mark-web { background: #1b1814; }
+.integration-mark-rxjs { background: #d81b60; }
+.integration-mark-effect { background: #6e56cf; }
 
 .hero {
   background: var(--ink);

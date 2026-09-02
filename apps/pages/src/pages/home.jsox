@@ -20,7 +20,7 @@ const jsxSrc = `const el = (
   </button>
 );`;
 
-const examples = [
+const basicExamples = [
   {
     href: "#/hello",
     kicker: "01",
@@ -45,17 +45,29 @@ const examples = [
     title: "POJO",
     blurb: "The same syntax builds plain objects. If the target implements add(), JSOX uses it.",
   },
+];
+
+const integrationExamples = [
+  {
+    href: "#/web-components",
+    mark: "<>",
+    markClass: "integration-mark-web",
+    title: "Web Components",
+    blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
+  },
   {
     href: "#/rxjs",
-    kicker: "05",
+    mark: "Rx",
+    markClass: "integration-mark-rxjs",
     title: "RxJS",
     blurb: "JSOX constructs the DOM. Streams own the updates — no render cycle in between.",
   },
   {
-    href: "#/web-components",
-    kicker: "06",
-    title: "Web Components",
-    blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
+    href: "#/effect",
+    mark: "Fx",
+    markClass: "integration-mark-effect",
+    title: "Effect",
+    blurb: "Effects own retries, typed failures, cancellation, and cleanup while JSOX owns the concrete view.",
   },
 ];
 
@@ -219,14 +231,14 @@ export function Home() {
     <section> {
       .className = "home-wrap"
       <p> { .className = "kicker"; ["Examples"] }
-      <h2> { .className = "section-title"; ["Six small apps, one dialect."] }
+      <h2> { .className = "section-title"; ["Start with the language."] }
       <p> {
         .className = "section-lede"
-        ["Each example is a real page. DOM widgets, a plain-object album, streams that update nodes JSOX already constructed."]
+        ["The basics isolate one idea at a time: construction, captured references, live lists, and non-DOM objects."]
       }
       <ul> {
         .className = "grid pitch-grid"
-        for (const ex of examples) {
+        for (const ex of basicExamples) {
           <li> {
             <a> {
               .className = "card pitch-card"
@@ -234,6 +246,36 @@ export function Home() {
               <p> { .className = "kicker"; [ex.kicker] }
               <h2> { [ex.title] }
               <p> { [ex.blurb] }
+            }
+          }
+        }
+      }
+
+      <div> {
+        .className = "examples-group"
+        <p> { .className = "kicker"; ["Integrations"] }
+        <h2> { .className = "section-title"; ["Bring the tools you already use."] }
+        <p> {
+          .className = "section-lede"
+          ["JSOX handles construction. Browser standards and focused libraries can keep owning components, streams, effects, and application behavior."]
+        }
+        <ul> {
+          .className = "grid integration-grid"
+          for (const integration of integrationExamples) {
+            <li> {
+              <a> {
+                .className = "card integration-card"
+                .href = integration.href
+                <span> {
+                  .className = `integration-mark ${integration.markClass}`
+                  .setAttribute("aria-hidden", "true")
+                  [integration.mark]
+                }
+                <div> {
+                  <h2> { [integration.title] }
+                  <p> { [integration.blurb] }
+                }
+              }
             }
           }
         }

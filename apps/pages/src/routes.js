@@ -4,6 +4,7 @@ export const routes = new Map([
   ["/tutorial", "jsox-tutorial-page"],
   ["/hello", "jsox-hello-page"],
   ["/counter", "jsox-counter-page"],
+  ["/effect", "jsox-effect-page"],
   ["/todo", "jsox-todo-page"],
   ["/pojo", "jsox-pojo-page"],
   ["/rxjs", "jsox-rxjs-page"],
