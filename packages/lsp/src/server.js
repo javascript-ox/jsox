@@ -64,7 +64,7 @@ export function start() {
         full: { delta: false },
       },
     },
-    serverInfo: { name: "JSOX", version: "0.1.0" },
+    serverInfo: { name: "JSOX", version: "0.2.0" },
   }));
 
   const diagTimers = new Map();
