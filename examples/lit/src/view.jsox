@@ -1,0 +1,65 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { css, html, LitElement } from "lit";
+
+class ReleaseHealth extends LitElement {
+  static properties = {
+    release: { type: String },
+    services: { attribute: false },
+  };
+
+  static styles = css`
+    :host { display: block; max-width: 44rem; margin: 0 auto; color: #2d2925; font-family: ui-sans-serif, system-ui; }
+    section { padding: 1.5rem; border: 1px solid #ded5c7; border-top: .35rem solid #324fff; border-radius: .9rem; background: #fffdf8; }
+    header { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+    p { margin: 0; color: #675f55; } h2 { margin: .25rem 0 1rem; font-size: 1.7rem; }
+    ul { display: grid; gap: .6rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+    li { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: .8rem 1rem; border-radius: .65rem; background: #f2ece2; }
+    strong { color: #18794e; text-transform: capitalize; } button { border: 0; border-radius: 999px; padding: .6rem 1rem; background: #324fff; color: white; font: 700 .85rem ui-sans-serif, system-ui; cursor: pointer; }
+  `;
+
+  constructor() {
+    super();
+    this.release = "";
+    this.services = [];
+  }
+
+  refresh() {
+    this.services = this.services.map((service) => ({ ...service, latency: 40 + Math.floor(Math.random() * 90) }));
+  }
+
+  render() {
+    return html`
+      <section>
+        <header><div><p>Live service health</p><h2>${this.release}</h2></div><button @click=${this.refresh}>Refresh</button></header>
+        <ul>${this.services.map((service) => html`<li><span>${service.name}</span><strong>${service.status} · ${service.latency}ms</strong></li>`)}</ul>
+      </section>
+    `;
+  }
+}
+
+customElements.define("release-health", ReleaseHealth);
+
+export function LitExample() {
+  const services = [];
+  [services] {
+    [{ name: "Compiler", status: "healthy", latency: 52 }]
+    [{ name: "Language server", status: "healthy", latency: 71 }]
+    [{ name: "Examples CDN", status: "healthy", latency: 94 }]
+  }
+
+  const dashboard = <release-health> {
+    .release = "JSOX production channel"
+    .services = services
+  }
+
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Detailed integration · Lit"] }
+    <h1> { ["Configure a reactive custom element directly."] }
+    <p> { .className = "lede"; ["JSOX constructs the data graph and typed custom element. Lit owns reactive properties, its update cycle, and the encapsulated shadow-DOM template."] }
+    [dashboard]
+  }
+  return withSource(view, source, "JSOX host plus Lit component");
+}

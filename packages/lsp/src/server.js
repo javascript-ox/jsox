@@ -162,12 +162,18 @@ export function start() {
     const orig = doc.offsetAt(params.position);
     const tags = tagCompletions(doc.getText(), orig, {
       namespaces: Object.keys(js.config.namespaceHandlers),
+      namespaceTags: Object.fromEntries(
+        Object.entries(js.config.namespaceHandlers).map(([name, handler]) => [
+          name,
+          typeof handler === "object" ? handler.tags ?? [] : [],
+        ]),
+      ),
     });
     if (tags?.length) return tags;
     const fileName = pathOf(doc.uri);
     const entry = js.get(fileName) || js.upsert(fileName, doc.getText());
     if (!entry || entry.error) return null;
-    const gen = js.origOffsetToGen(entry, orig);
+    const gen = js.origOffsetToGen(entry, orig, true);
     const info = js.completions(fileName, gen);
     if (!info?.entries?.length) return null;
     return {

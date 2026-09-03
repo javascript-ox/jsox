@@ -55,7 +55,23 @@ describe("loadConfig", () => {
         normalizeConfig({
           namespaceHandlers: { view: { create: () => "makeView()", finalize: true } },
         }),
-      /optional finalize\(\)/,
+      /\.finalize must be a function/,
+    );
+    assert.throws(
+      () =>
+        normalizeConfig({
+          namespaceHandlers: { view: { create: () => "makeView()", tags: "card" } },
+        }),
+      /\.tags must be an array/,
+    );
+    assert.throws(
+      () =>
+        normalizeConfig({
+          namespaceHandlers: {
+            view: { create: () => "makeView()", types: { target: 42 } },
+          },
+        }),
+      /\.types must contain string or function/,
     );
     assert.throws(
       () => normalizeConfig({ defaultNamespace: "view" }),

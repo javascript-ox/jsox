@@ -1,0 +1,78 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Chip from "@mui/material/Chip";
+import LinearProgress from "@mui/material/LinearProgress";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+
+class ReactNodeBuilder {
+  constructor(type) { this.type = type; }
+  props = {};
+  children = [];
+  add(...children) { this.children.push(...children); }
+}
+
+function finalizeReactNode(builder) {
+  return React.createElement(builder.type, builder.props, ...builder.children);
+}
+
+function ReleaseDashboard() {
+  const [progress, setProgress] = useState(72);
+  const status = progress === 100 ? "Ready" : "Validating";
+
+  return <react:Card> {
+    .props.variant = "outlined"
+    .props.className = "mui-release-card"
+    .props.sx = { maxWidth: 720, margin: "0 auto", borderRadius: 3 }
+    <react:CardContent> {
+      <react:Stack> {
+        .props.spacing = 2.5
+        <react:Stack> {
+          .props.direction = "row"
+          .props.justifyContent = "space-between"
+          .props.alignItems = "center"
+          <react:Box> {
+            <react:Typography> { .props.variant = "overline"; .props.color = "primary"; ["Release train"] }
+            <react:Typography> { .props.variant = "h4"; .props.component = "h2"; ["JSOX 0.2"] }
+          }
+          <react:Chip> { .props.label = status; .props.color = progress === 100 ? "success" : "primary" }
+        }
+        <react:Typography> {
+          .props.color = "text.secondary"
+          ["Material UI components are ordinary React component types, so the namespace adapter can construct the complete tree without JSX."]
+        }
+        <react:LinearProgress> { .props.variant = "determinate"; .props.value = progress; .props.sx = { height: 10, borderRadius: 999 } }
+        <react:Typography> { .props.variant = "body2"; .props.fontWeight = 700; [`${progress}% of checks complete`] }
+        <react:Stack> {
+          .props.direction = "row"
+          .props.spacing = 1
+          <react:Button> { .props.variant = "outlined"; .props.onClick = () => setProgress(72); ["Reset"] }
+          <react:Button> { .props.variant = "contained"; .props.onClick = () => setProgress((value) => Math.min(100, value + 14)); ["Run next check"] }
+        }
+      }
+    }
+  }
+}
+
+export function MaterialUiExample() {
+  const mount = <section> { .className = "mui-mount" }
+  const root = createRoot(mount);
+  root.render(<react:ReleaseDashboard>);
+
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Detailed integration · React"] }
+    <h1> { ["Material UI, constructed in JSOX."] }
+    <p> { .className = "lede"; ["Every visible component below is a Material UI component created through the react namespace. React still owns hooks, events, and reconciliation."] }
+    [mount]
+  }
+  view.addEventListener("jsox:dispose", () => root.unmount(), { once: true });
+  return withSource(view, source, "Material UI component tree");
+}

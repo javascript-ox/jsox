@@ -1,0 +1,10 @@
+{
+  "name": "@js-ox/svelte",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./src/view.jsox" },
+  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+  "dependencies": { "@js-ox/ui": "*", "svelte": "latest" },
+  "devDependencies": { "@js-ox/compiler": "*", "@sveltejs/vite-plugin-svelte": "^5.1.1", "vite": "^6.3.5" }
+}

@@ -123,6 +123,36 @@ element.mount();`;
     assert.match(text, /ReactElement/);
   });
 
+  it("uses explicit namespace type metadata without requiring runtime symbols", () => {
+    const js = createJsService({
+      namespaceHandlers: {
+        react: {
+          create: () => "missingBuilder()",
+          finalize: () => "missingFinalizer()",
+          types: {
+            target: "ElementBuilder",
+            result: "ReactElement",
+          },
+        },
+      },
+    });
+    const file = "/tmp/typed-namespace.jsox";
+    const source = `class ElementBuilder { props = {}; }
+class ReactElement { mount() {} }
+const element = <react:card> {
+  .props = { role: "button" }
+};
+element.mount();`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("element =")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /ReactElement/);
+  });
+
   it("completes this-shorthand as element properties", () => {
     const js = createJsService();
     const file = "/tmp/props.jsox";
@@ -213,5 +243,14 @@ describe("tag completions", () => {
       namespaces: ["html", "svg", "react"],
     });
     assert.deepEqual(items.map((item) => item.label), ["react:"]);
+  });
+
+  it("suggests configured tags after a custom namespace", () => {
+    const items = tagCompletions("<react:Bu", 9, {
+      namespaces: ["html", "svg", "react"],
+      namespaceTags: { react: ["article", "Button", "ButtonGroup"] },
+    });
+    assert.deepEqual(items.map((item) => item.label), ["Button", "ButtonGroup"]);
+    assert.equal(items[0].detail, "react namespace tag");
   });
 });

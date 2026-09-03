@@ -210,11 +210,12 @@ export function tagCompletions(source, offset, options = {}) {
   const namespace = tagNamespace(source, offset);
   const lower = prefix.toLowerCase();
   const registered = new Set(registeredComponentTags(source));
+  const configured = options.namespaceTags?.[namespace] ?? [];
   const tags = namespace === "svg"
     ? SVG_TAGS
     : namespace === null || namespace === "html"
       ? [...registered, ...HTML_TAGS]
-      : [];
+      : configured;
   const namespaceNames = options.namespaces ?? ["html", "svg"];
   const namespaces = namespace === null
     ? [...new Set(namespaceNames)].map((name) => ({
@@ -243,7 +244,9 @@ export function tagCompletions(source, offset, options = {}) {
           ? "Registered web component"
           : namespace === "svg"
             ? "SVG element"
-            : "HTML element",
+            : namespace === null || namespace === "html"
+              ? "HTML element"
+              : `${namespace} namespace tag`,
         insertText: tag,
       })),
   ];

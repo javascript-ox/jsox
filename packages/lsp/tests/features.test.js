@@ -37,6 +37,21 @@ describe("jsox session", () => {
     assert.ok(labels.has("className"));
   });
 
+  it("completes a newly inserted shorthand inside a completed block", () => {
+    const session = createJsoxSession();
+    const file = "/tmp/features-inserted-dot.jsox";
+    const source = `const el = <div> {
+  .
+  .style = {}
+}`;
+    session.upsert(file, source);
+    const items = session.completions(file, source.indexOf(".\n") + 1, source);
+    const labels = new Set(items.map((item) => item.label));
+    assert.ok(labels.has("className"));
+    assert.ok(labels.has("style"));
+    assert.ok(labels.has("click"));
+  });
+
   it("finds a same-file definition", () => {
     const session = createJsoxSession();
     const file = "/tmp/features-def.jsox";
