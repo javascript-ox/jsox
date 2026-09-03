@@ -1,0 +1,69 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { createApp, h, ref } from "vue";
+
+class VueNodeBuilder {
+  constructor(type) {
+    this.type = type;
+  }
+
+  props = {};
+  children = [];
+
+  add(...children) {
+    this.children.push(...children);
+  }
+}
+
+function finalizeVueNode(builder) {
+  return h(builder.type, builder.props, builder.children);
+}
+
+function VueCounter() {
+  const count = ref(0);
+
+  return () => <vue:article> {
+    .props.class = "panel framework-card vue-card"
+    <vue:p> { .props.class = "kicker"; ["Vue VNode tree"] }
+    <vue:h2> { ["Reactive state, concrete construction."] }
+    <vue:p> {
+      .props.class = "framework-count"
+      [`Count: ${count.value}`]
+    }
+    <vue:div> {
+      .props.class = "button-row"
+      <vue:button> {
+        .props.type = "button"
+        .props.class = "btn"
+        .props.onClick = () => count.value--
+        ["Decrease"]
+      }
+      <vue:button> {
+        .props.type = "button"
+        .props.class = "btn btn-accent"
+        .props.onClick = () => count.value++
+        ["Increase"]
+      }
+    }
+  }
+}
+
+export function VueExample() {
+  const mount = <section> { .className = "framework-mount" }
+  const app = createApp({ setup: VueCounter });
+  app.mount(mount);
+
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Vue"] }
+    <h1> { ["Finalize JSOX builders into Vue VNodes."] }
+    <p> {
+      .className = "lede"
+      ["The vue namespace turns nested JSOX selectors into VNodes. Vue still owns refs, dependency tracking, rendering, and component lifecycle."]
+    }
+    [mount]
+  }
+  view.addEventListener("jsox:dispose", () => app.unmount(), { once: true });
+  return withSource(view, source, "Vue VNode tree and namespace adapter");
+}

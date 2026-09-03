@@ -439,8 +439,17 @@ pre.code {
 .integration-mark-sortable { background: #5b5bd6; }
 .integration-mark-tanstack-table { background: linear-gradient(135deg, #00c7b7 50%, #ef4444 50%); }
 .integration-mark-shadcn { background: #09090b; }
+.integration-mark-react { background: #087ea4; }
+.integration-mark-vue { background: linear-gradient(135deg, #42b883 50%, #35495e 50%); }
 
 .button-row { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; }
+
+.framework-mount { display: block; }
+.framework-card { display: grid; gap: 1rem; }
+.framework-card h2 { margin-bottom: 0; }
+.framework-count { margin: 0; color: var(--accent); font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1; }
+.react-card { border-top: 0.35rem solid #087ea4; }
+.vue-card { border-top: 0.35rem solid #42b883; }
 
 .alpine-demo,
 .mobx-demo,

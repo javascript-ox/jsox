@@ -19,6 +19,7 @@
     "@js-ox/htmx": "*",
     "@js-ox/mobx": "*",
     "@js-ox/pojo": "*",
+    "@js-ox/react-example": "*",
     "@js-ox/rxjs": "*",
     "@js-ox/shadcn": "*",
     "@js-ox/sortable": "*",
@@ -31,6 +32,7 @@
     "@js-ox/web-components": "*",
     "@js-ox/web-components-example": "*",
     "@js-ox/xstate": "*",
+    "@js-ox/vue-example": "*",
     "@js-ox/zod": "*"
   },
   "devDependencies": {

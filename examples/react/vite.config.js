@@ -5,5 +5,5 @@ import config from "../../jsox.config.js";
 export default defineConfig({
   plugins: [jsox({ config })],
   base: "./",
-  server: { port: 5180, strictPort: true },
+  server: { port: 5195, strictPort: true },
 });

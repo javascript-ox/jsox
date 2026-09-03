@@ -94,6 +94,20 @@ const libraryIntegrations = [
 
 const frontendIntegrations = [
   {
+    href: "#/react",
+    mark: "⚛",
+    markClass: "integration-mark-react",
+    title: "React",
+    blurb: "A namespace finalizer turns nested mutable JSOX builders into immutable React elements with hooks and reconciliation intact.",
+  },
+  {
+    href: "#/vue",
+    mark: "V",
+    markClass: "integration-mark-vue",
+    title: "Vue",
+    blurb: "Nested selectors finalize into Vue VNodes while refs, dependency tracking, and rendering remain native Vue.",
+  },
+  {
     href: "#/alpine",
     mark: "A",
     markClass: "integration-mark-alpine",

@@ -106,7 +106,7 @@ mapping positions through JSOX syntax.
 The [example gallery](https://javascript-ox.github.io/jsox/) includes basic DOM
 and plain-object examples as well as integrations with:
 
-- Alpine, HTMX, Stimulus, and native Web Components
+- React, Vue, Alpine, HTMX, Stimulus, and native Web Components
 - RxJS, Effect, XState, MobX, and Zod
 - Three.js, D3, Chart.js, GSAP, and SortableJS
 - TanStack Query, TanStack Table, and shadcn/ui-style primitives
@@ -126,6 +126,37 @@ Or run an individual example, such as:
 npm run example:counter
 npm run example:three
 ```
+
+## Scoped tags
+
+Selectors can choose a configured construction namespace. Built-in `html` and
+`svg` namespaces keep DOM typing, while custom handlers can create any kind of
+target:
+
+```js
+const icon = <svg:circle> {
+  .setAttribute("r", "10")
+}
+```
+
+A handler may be a creation function or an object with separate construction
+and finalization phases. This lets a mutable JSOX scope produce an immutable
+result such as a React element or Vue VNode:
+
+```js
+export default {
+  namespaceHandlers: {
+    react: {
+      create: tag => `new ReactNodeBuilder(${tag})`,
+      finalize: target => `finalizeReactNode(${target})`,
+    },
+  },
+};
+```
+
+The creation expression types `this` inside the block; the finalization
+expression types the completed selector. See the standalone
+[`React`](examples/react) and [`Vue`](examples/vue) examples.
 
 ## Web Components
 
@@ -155,15 +186,15 @@ lifecycle hooks and registration behavior.
 The central goal for **0.2.0** is making selectors extensible beyond their
 current construction model:
 
-- [ ] Custom handlers/factories for `<>` selectors
-- [ ] Namespaced `<>` selectors
-- [ ] A configurable default selector namespace
-- [ ] Compiler, LSP, documentation, and backward-compatibility coverage
+- [x] Custom handlers/factories for `<>` selectors
+- [x] Namespaced `<>` selectors
+- [x] A configurable default selector namespace
+- [x] Compiler, LSP, documentation, and backward-compatibility coverage
 
 Follow the detailed checklist in
 [issue #19](https://github.com/javascript-ox/jsox/issues/19). This work is
-intended to provide a clean foundation for richer integrations—including React
-and Vue—without coupling the compiler to a particular framework.
+provides a clean foundation for richer integrations—including React and
+Vue—without coupling the compiler to a particular framework.
 
 ## Development
 

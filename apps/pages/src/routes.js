@@ -13,6 +13,7 @@ export const routes = new Map([
   ["/mobx", () => import("@js-ox/mobx").then(({ MobxExample }) => MobxExample())],
   ["/todo", () => import("@js-ox/todo").then(({ Todo }) => Todo())],
   ["/pojo", () => import("@js-ox/pojo").then(({ Pojo }) => Pojo())],
+  ["/react", () => import("@js-ox/react-example").then(({ ReactExample }) => ReactExample())],
   ["/rxjs", () => import("@js-ox/rxjs").then(({ Rxjs }) => Rxjs())],
   ["/shadcn", () => import("@js-ox/shadcn").then(({ ShadcnExample }) => ShadcnExample())],
   ["/sortable", () => import("@js-ox/sortable").then(({ SortableExample }) => SortableExample())],
@@ -21,6 +22,7 @@ export const routes = new Map([
   ["/tanstack", () => import("@js-ox/tanstack-query").then(({ TanStackExample }) => TanStackExample())],
   ["/tanstack-table", () => import("@js-ox/tanstack-table").then(({ TanStackTableExample }) => TanStackTableExample())],
   ["/web-components", () => import("@js-ox/web-components-example").then(({ WebComponents }) => WebComponents())],
+  ["/vue", () => import("@js-ox/vue-example").then(({ VueExample }) => VueExample())],
   ["/xstate", () => import("@js-ox/xstate").then(({ XStateExample }) => XStateExample())],
   ["/zod", () => import("@js-ox/zod").then(({ ZodExample }) => ZodExample())],
 ]);
