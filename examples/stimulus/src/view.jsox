@@ -1,0 +1,59 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { Application, Controller } from "@hotwired/stimulus";
+
+class GreetingController extends Controller {
+  static targets = ["name", "output"];
+
+  greet() {
+    const name = this.nameTarget.value.trim() || "JSOX developer";
+    this.outputTarget.textContent = `Hello, ${name}. Stimulus handled that action.`;
+  }
+}
+
+export function StimulusExample() {
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Stimulus"] }
+    <h1> { ["Behavior for the HTML you already own."] }
+    <p> { .className = "lede"; ["JSOX constructs the controller scope, target, and action attributes. Stimulus connects behavior to that finished subtree."] }
+    <section> {
+      .className = "panel stimulus-demo"
+      .setAttribute("data-controller", "greeting")
+      <label> {
+        ["Your name"]
+        <input> {
+          .type = "text"
+          .placeholder = "Ada"
+          .setAttribute("data-greeting-target", "name")
+          .setAttribute("data-action", "keydown.enter->greeting#greet")
+        }
+      }
+      <button> {
+        .type = "button"
+        .className = "btn btn-accent"
+        .setAttribute("data-action", "greeting#greet")
+        ["Greet"]
+      }
+      <p> {
+        .className = "stimulus-output"
+        .setAttribute("data-greeting-target", "output")
+        ["Waiting for the controller."]
+      }
+    }
+  }
+
+  const application = Application.start(root);
+  application.register("greeting", GreetingController);
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      application.stop();
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+  return withSource(root, source);
+}

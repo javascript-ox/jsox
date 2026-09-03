@@ -185,7 +185,7 @@ export function Tutorial() {
       <pre> { .className = "code"; [tutPojo] }
 
       <p> {
-        ["When you want to see this running, the overview has five small apps — including a POJO album and an RxJS clock."]
+        ["When you want to see this running, the overview has basic examples plus integrations for components, streams, effects, state machines, validation, animation, and data visualization."]
       }
       <p> {
         <a> {

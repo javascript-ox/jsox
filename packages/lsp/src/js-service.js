@@ -1,9 +1,32 @@
 import ts from "typescript";
 import { spliceWithMap, origToGen, genToOrig } from "@js-ox/compiler/splice";
+import { normalizeConfig } from "@js-ox/compiler";
 import { PREAMBLE } from "./preamble.js";
 
-function toVirtual(source) {
-  const { code, maps } = spliceWithMap(source, { incompleteThis: true, recover: true });
+function typeWitness(config, explicitNamespace, tag) {
+  const namespace = explicitNamespace ?? config.defaultNamespace;
+  const handler = config.namespaceHandlers[namespace];
+  if (!handler) return null;
+  const factory = typeof handler === "function" ? handler : handler.create;
+  const context = {
+    namespace,
+    explicitNamespace,
+    qualifiedName: `${namespace}:${tag}`,
+  };
+  const target = factory(tag, context);
+  if (typeof handler !== "object" || !handler.finalize) return target;
+  return {
+    target,
+    result: handler.finalize(target, { tag, ...context }),
+  };
+}
+
+function toVirtual(source, config) {
+  const { code, maps } = spliceWithMap(source, {
+    incompleteThis: true,
+    recover: true,
+    typeWitness: (namespace, tag) => typeWitness(config, namespace, tag),
+  });
   return { code: PREAMBLE + code, maps, preamble: PREAMBLE.length };
 }
 
@@ -29,13 +52,13 @@ function genOffsetToOrig(entry, offset) {
   return genToOrig(entry.maps, offset - entry.preamble);
 }
 
-function loadDisk(fileName) {
+function loadDisk(fileName, config) {
   if (/\.css(\.js)?$/.test(fileName)) return "export {};\n";
   const raw = ts.sys.readFile(fileName);
   if (raw == null) return undefined;
   if (fileName.endsWith(".jsox")) {
     try {
-      return PREAMBLE + spliceWithMap(raw, { incompleteThis: true, recover: true }).code;
+      return toVirtual(raw, config).code;
     } catch {
       return raw;
     }
@@ -43,7 +66,8 @@ function loadDisk(fileName) {
   return raw;
 }
 
-export function createJsService() {
+export function createJsService(configInput = {}) {
+  const config = normalizeConfig(configInput);
   /** @type {Map<string, { version: number, source: string, code: string, maps: object[], preamble: number }>} */
   const docs = new Map();
   let projectVersion = 0;
@@ -69,7 +93,7 @@ export function createJsService() {
     getScriptSnapshot: (fileName) => {
       const doc = docs.get(fileName);
       if (doc) return ts.ScriptSnapshot.fromString(doc.code);
-      const raw = loadDisk(diskName(fileName));
+      const raw = loadDisk(diskName(fileName), config);
       if (raw == null) return undefined;
       return ts.ScriptSnapshot.fromString(raw);
     },
@@ -80,7 +104,7 @@ export function createJsService() {
     readFile: (fileName) => {
       const doc = docs.get(fileName);
       if (doc) return doc.code;
-      return loadDisk(diskName(fileName));
+      return loadDisk(diskName(fileName), config);
     },
     readDirectory: ts.sys.readDirectory,
     directoryExists: ts.sys.directoryExists,
@@ -94,7 +118,7 @@ export function createJsService() {
     const name = tsName(fileName);
     let virtual;
     try {
-      virtual = toVirtual(source);
+      virtual = toVirtual(source, config);
     } catch (err) {
       const prev = docs.get(name);
       docs.set(name, {
@@ -154,7 +178,7 @@ export function createJsService() {
     if (!entry) {
       const source = ts.sys.readFile(physical);
       if (source == null) return def;
-      entry = { source, ...toVirtual(source) };
+      entry = { source, ...toVirtual(source, config) };
     }
     const start = genOffsetToOrig(entry, def.textSpan.start);
     const end = genOffsetToOrig(entry, def.textSpan.start + def.textSpan.length);
@@ -203,6 +227,14 @@ export function createJsService() {
       const name = match[1];
       const start = match.index + match[0].lastIndexOf(name);
       const info = service.getQuickInfoAtPosition(tsName(fileName), origOffsetToGen(entry, start));
+      for (let i = tokens.length - 1; i >= 0; i--) {
+        if (
+          tokens[i].start < start + name.length &&
+          tokens[i].end > start
+        ) {
+          tokens.splice(i, 1);
+        }
+      }
       tokens.push({
         start,
         end: start + name.length,
@@ -210,6 +242,16 @@ export function createJsService() {
           info?.kind === ts.ScriptElementKind.memberFunctionElement
             ? 11
             : 9,
+        modifiers: 0,
+      });
+    }
+    const scopedTag = /<([A-Za-z][\w-]*):[A-Za-z][\w-]*>/g;
+    for (const match of entry.source.matchAll(scopedTag)) {
+      const start = match.index + 1;
+      tokens.push({
+        start,
+        end: start + match[1].length,
+        type: 3, // namespace
         modifiers: 0,
       });
     }
@@ -242,5 +284,6 @@ export function createJsService() {
     semanticTokens,
     diagnostics,
     tsName,
+    config,
   };
 }

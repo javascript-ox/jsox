@@ -2,17 +2,39 @@ import { defineComponent } from "@js-ox/web-components";
 import { currentPath, resolveRoute } from "./routes.js";
 
 const github = "https://github.com/javascript-ox/jsox";
+const isDevelopment = import.meta.env.VITE_JSOX_CHANNEL === "develop";
 const siteState = new WeakMap();
+
+function replaceOutlet(outlet, ...children) {
+  for (const child of outlet.children) {
+    child.dispatchEvent(new CustomEvent("jsox:dispose"));
+  }
+  outlet.replaceChildren(...children);
+}
 
 function render(site) {
   const path = currentPath();
   const outlet = site.querySelector(".outlet");
-  outlet.replaceChildren(document.createElement(resolveRoute(path)));
+  const channelSwitch = site.querySelector(".channel-switch");
+  const channelUrl = new URL(isDevelopment ? "../" : "develop/", document.baseURI);
+  channelUrl.hash = `#${path}`;
+  channelSwitch.href = channelUrl.href;
+  const state = siteState.get(site);
+  const renderId = ++state.renderId;
+  replaceOutlet(outlet);
   document.body.classList.toggle("is-home", path === "/");
+  document.body.classList.toggle("is-development", isDevelopment);
 
   for (const link of site.querySelectorAll(".site-nav a[href^='#']")) {
     link.classList.toggle("is-active", link.getAttribute("href") === `#${path}`);
   }
+
+  resolveRoute(path)().then((view) => {
+    if (state.renderId === renderId) replaceOutlet(outlet, view);
+  }).catch((error) => {
+    console.error("Unable to load route", error);
+    if (state.renderId === renderId) outlet.textContent = "Unable to load this page.";
+  });
 }
 
 [defineComponent("jsox-site")] {
@@ -23,7 +45,15 @@ function render(site) {
       <a> { .href = "#/start"; ["Quick Start"] }
       <a> { .href = "#/tutorial"; ["Basic Tutorial"] }
       <a> {
-        .className = "nav-extra"
+        .className = "channel-switch nav-extra"
+        if (isDevelopment) {
+          <span> { .className = "channel-badge"; ["Development"] }
+          ["View stable"]
+        } else {
+          ["View development"]
+        }
+      }
+      <a> {
         .href = github
         .target = "_blank"
         .rel = "noopener noreferrer"
@@ -42,14 +72,14 @@ function render(site) {
   .connected = function () {
     if (siteState.has(this)) return
     const onHashChange = () => render(this)
-    siteState.set(this, onHashChange)
+    siteState.set(this, { onHashChange, renderId: 0 })
     window.addEventListener("hashchange", onHashChange)
     render(this)
   }
   .disconnected = function () {
-    const onHashChange = siteState.get(this)
-    if (!onHashChange) return
-    window.removeEventListener("hashchange", onHashChange)
+    const state = siteState.get(this)
+    if (!state) return
+    window.removeEventListener("hashchange", state.onHashChange)
     siteState.delete(this)
   }
   .register()

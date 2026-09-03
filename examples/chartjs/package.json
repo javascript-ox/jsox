@@ -1,0 +1,10 @@
+{
+  "name": "@js-ox/chartjs",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./src/view.jsox" },
+  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+  "dependencies": { "@js-ox/ui": "*", "chart.js": "^4.5.0" },
+  "devDependencies": { "@js-ox/compiler": "*", "vite": "^6.3.5" }
+}

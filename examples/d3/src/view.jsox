@@ -1,0 +1,71 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { scaleBand, scaleLinear } from "d3";
+
+const svgNode = (name) => document.createElementNS("http://www.w3.org/2000/svg", name);
+
+export function D3Example() {
+  const names = ["Create", "Configure", "Compose", "Ship"];
+  let values = [38, 64, 52, 86];
+  const chart = svgNode("svg");
+  [chart] {
+    .classList.add("bar-chart")
+    .setAttribute("viewBox", "0 0 640 280")
+    .setAttribute("role", "img")
+    .setAttribute("aria-label", "Example values rendered as a bar chart")
+  }
+  const bars = names.map((name) => {
+    const rect = svgNode("rect");
+    const label = svgNode("text");
+    const value = svgNode("text");
+    [chart] { [rect]; [label]; [value] }
+    return { name, rect, label, value };
+  });
+
+  const render = () => {
+    const x = scaleBand().domain(names).range([45, 620]).padding(0.22);
+    const y = scaleLinear().domain([0, 100]).range([235, 25]);
+    bars.forEach((bar, index) => {
+      const top = y(values[index]);
+      bar.rect.setAttribute("x", x(bar.name));
+      bar.rect.setAttribute("y", top);
+      bar.rect.setAttribute("width", x.bandwidth());
+      bar.rect.setAttribute("height", 235 - top);
+      bar.rect.setAttribute("rx", "7");
+      bar.label.setAttribute("x", x(bar.name) + x.bandwidth() / 2);
+      bar.label.setAttribute("y", "258");
+      bar.label.textContent = bar.name;
+      bar.value.setAttribute("x", x(bar.name) + x.bandwidth() / 2);
+      bar.value.setAttribute("y", top - 8);
+      bar.value.textContent = values[index];
+    });
+  };
+
+  const randomize = <button> { .type = "button"; .className = "btn btn-accent"; ["New data"] }
+  const update = () => {
+    values = values.map(() => 20 + Math.floor(Math.random() * 76));
+    render();
+  };
+  randomize.addEventListener("click", update);
+  render();
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["D3"] }
+    <h1> { ["Scales without surrendered ownership."] }
+    <p> { .className = "lede"; ["JSOX constructs the SVG nodes. D3 maps domain data into positions, widths, and heights."] }
+    <section> { .className = "panel chart-demo"; [chart]; [randomize] }
+  }
+
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      randomize.removeEventListener("click", update);
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+  return withSource(root, source);
+}

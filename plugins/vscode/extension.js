@@ -37,7 +37,10 @@ async function activate(context) {
   let session;
   try {
     const mod = require("./dist/session.js");
-    session = mod.createJsoxSession();
+    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    session = root
+      ? await mod.createJsoxSessionForRoot(root)
+      : mod.createJsoxSession();
     output.appendLine("language service ready");
     status.text = "$(check) JSOX";
     status.tooltip = "JSOX language service ready — hover, complete, go to definition";

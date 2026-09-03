@@ -1,0 +1,63 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { z } from "zod";
+
+const profileSchema = z.object({
+  email: z.string().email("Enter a valid email address."),
+  age: z.coerce.number().int().min(18, "You must be at least 18."),
+});
+
+export function ZodExample() {
+  const email = <input> { .type = "email"; .name = "email"; .placeholder = "you@example.com" }
+  const emailError = <span> { .className = "field-error" }
+  const age = <input> { .type = "number"; .name = "age"; .min = "0"; .placeholder = "18" }
+  const ageError = <span> { .className = "field-error" }
+  const result = <p> { .className = "validation-result"; ["Submit to parse the form."] }
+
+  const form = <form> {
+    .className = "validation-form"
+    .noValidate = true
+    <label> { ["Email"]; [email]; [emailError] }
+    <label> { ["Age"]; [age]; [ageError] }
+    <button> { .type = "submit"; .className = "btn btn-accent"; ["Validate"] }
+  }
+
+  const validate = (event) => {
+    event.preventDefault();
+    emailError.textContent = "";
+    ageError.textContent = "";
+    const parsed = profileSchema.safeParse(Object.fromEntries(new FormData(form)));
+    if (parsed.success) {
+      result.className = "validation-result is-valid";
+      result.textContent = `Valid profile for ${parsed.data.email}, age ${parsed.data.age}.`;
+      return;
+    }
+    result.className = "validation-result is-invalid";
+    result.textContent = "Zod rejected the submitted value.";
+    for (const issue of parsed.error.issues) {
+      if (issue.path[0] === "email") emailError.textContent = issue.message;
+      if (issue.path[0] === "age") ageError.textContent = issue.message;
+    }
+  };
+  form.addEventListener("submit", validate);
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Zod"] }
+    <h1> { ["Parse at the boundary."] }
+    <p> { .className = "lede"; ["JSOX constructs a native form. Zod turns its untrusted string values into validated application data."] }
+    <section> { .className = "panel"; [form]; [result] }
+  }
+
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      form.removeEventListener("submit", validate);
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+  return withSource(root, source);
+}

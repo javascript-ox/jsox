@@ -1,0 +1,3 @@
+import { ReactExample } from "./view.jsox";
+
+[document.body] { [ReactExample()] }

@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { pathToFileURL } from "node:url";
+import { loadConfig } from "@js-ox/compiler";
 import { createJsService } from "./js-service.js";
 import { tagCompletions } from "./tags.js";
 
@@ -40,8 +41,8 @@ function completionKind(kind) {
 /**
  * Editor-agnostic JSOX intelligence. Positions are original-source offsets.
  */
-export function createJsoxSession() {
-  const js = createJsService();
+export function createJsoxSession(config = {}) {
+  const js = createJsService(config);
 
   function ensure(fileName, source) {
     const prev = js.get(fileName);
@@ -73,7 +74,9 @@ export function createJsoxSession() {
     },
 
     completions(fileName, orig, source) {
-      const tags = tagCompletions(source, orig);
+      const tags = tagCompletions(source, orig, {
+        namespaces: Object.keys(js.config.namespaceHandlers),
+      });
       if (tags?.length) {
         return tags.map((t) => ({
           label: t.label,
@@ -201,4 +204,9 @@ export function createJsoxSession() {
       return out;
     },
   };
+}
+
+/** Create an editor session using the jsox.config.js in a workspace root. */
+export async function createJsoxSessionForRoot(root) {
+  return createJsoxSession(await loadConfig(root));
 }

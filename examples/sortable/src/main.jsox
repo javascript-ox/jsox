@@ -1,0 +1,3 @@
+import { SortableExample } from "./view.jsox";
+
+[document.body] { [SortableExample()] }

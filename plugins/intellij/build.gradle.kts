@@ -53,6 +53,13 @@ intellijPlatform {
 
 val bundleLsp by tasks.registering(Exec::class) {
   val outDir = lspDist.get().asFile
+  inputs.files(
+    fileTree(repoRoot.dir("packages/compiler/src")) { include("**/*.js") },
+    fileTree(repoRoot.dir("packages/lsp/src")) { include("**/*.js") },
+    repoRoot.file("packages/compiler/package.json"),
+    repoRoot.file("packages/lsp/package.json"),
+    repoRoot.file("package-lock.json"),
+  )
   outputs.dir(outDir)
   workingDir = repoRoot.asFile
   commandLine(

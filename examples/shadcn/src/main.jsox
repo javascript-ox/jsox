@@ -1,0 +1,3 @@
+import { ShadcnExample } from "./view.jsox";
+
+[document.body] { [ShadcnExample()] }

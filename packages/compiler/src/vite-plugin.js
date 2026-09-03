@@ -32,6 +32,7 @@ export default function jsoxPlugin(options = {}) {
       }
     },
     transform(code, id) {
+      if (id.includes("?raw")) return null;
       const file = id.split("?")[0];
       if (!file.endsWith(".jsox")) return null;
       const result = compile(code, config ?? normalizeConfig());

@@ -155,6 +155,83 @@ describe("compile: config", () => {
       /config\.childHelperName must be a valid JavaScript identifier/,
     );
   });
+
+  it("uses a factory selected by an explicit namespace", () => {
+    let received;
+    const code = js(`<view:card>`, {
+      namespaceHandlers: {
+        view(tag, context) {
+          received = { tag, ...context };
+          return `makeView(${JSON.stringify(tag)})`;
+        },
+      },
+    });
+    assert.match(code, /makeView\("card"\)/);
+    assert.deepEqual(received, {
+      tag: "card",
+      namespace: "view",
+      explicitNamespace: "view",
+      qualifiedName: "view:card",
+    });
+  });
+
+  it("uses the configured default namespace for unqualified tags", () => {
+    const code = js(`<card>`, {
+      defaultNamespace: "view",
+      namespaceHandlers: {
+        view: (tag) => `makeView(${JSON.stringify(tag)})`,
+      },
+    });
+    assert.match(code, /makeView\("card"\)/);
+    assert.equal(code.includes("createElement"), false);
+  });
+
+  it("supports mixed namespaces in nested trees", () => {
+    const code = js(`<section> { <view:card> }`, {
+      namespaceHandlers: {
+        view: (tag) => `makeView(${JSON.stringify(tag)})`,
+      },
+    });
+    assert.match(code, /document\.createElement\("section"\)/);
+    assert.match(code, /makeView\("card"\)/);
+  });
+
+  it("creates SVG elements with the built-in svg namespace", () => {
+    const code = js(`<svg:circle>`);
+    assert.match(
+      code,
+      /document\.createElementNS\("http:\/\/www\.w3\.org\/2000\/svg", "circle"\)/,
+    );
+  });
+
+  it("rejects an unknown explicit namespace", () => {
+    assert.throws(
+      () => js(`<missing:card>`),
+      /Unknown tag namespace "missing"/,
+    );
+  });
+
+  it("requires namespace factories to return JavaScript expression strings", () => {
+    assert.throws(
+      () => js(`<view:card>`, { namespaceHandlers: { view: () => ({}) } }),
+      /config\.namespaceHandlers\["view"\]\(\) must return a JavaScript expression string/,
+    );
+  });
+
+  it("requires namespace finalizers to return JavaScript expression strings", () => {
+    assert.throws(
+      () =>
+        js(`<view:card>`, {
+          namespaceHandlers: {
+            view: {
+              create: () => `makeView()`,
+              finalize: () => ({}),
+            },
+          },
+        }),
+      /config\.namespaceHandlers\["view"\]\.finalize\(\) must return a JavaScript expression string/,
+    );
+  });
 });
 
 describe("compile: arrays vs captures", () => {

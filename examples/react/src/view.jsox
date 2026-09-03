@@ -1,0 +1,70 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+class ReactNodeBuilder {
+  constructor(type) {
+    this.type = type;
+  }
+
+  props = {};
+  children = [];
+
+  add(...children) {
+    this.children.push(...children);
+  }
+}
+
+function finalizeReactNode(builder) {
+  return React.createElement(builder.type, builder.props, ...builder.children);
+}
+
+function CounterCard() {
+  const [count, setCount] = useState(0);
+
+  return <react:article> {
+    .props.className = "panel framework-card react-card"
+    <react:p> { .props.className = "kicker"; ["React element tree"] }
+    <react:h2> { ["JSOX all the way down."] }
+    <react:p> {
+      .props.className = "framework-count"
+      [`Count: ${count}`]
+    }
+    <react:div> {
+      .props.className = "button-row"
+      <react:button> {
+        .props.type = "button"
+        .props.className = "btn"
+        .props.onClick = () => setCount((value) => value - 1)
+        ["Decrease"]
+      }
+      <react:button> {
+        .props.type = "button"
+        .props.className = "btn btn-accent"
+        .props.onClick = () => setCount((value) => value + 1)
+        ["Increase"]
+      }
+    }
+  }
+}
+
+export function ReactExample() {
+  const mount = <section> { .className = "framework-mount" }
+  const root = createRoot(mount);
+  root.render(<react:CounterCard>);
+
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["React"] }
+    <h1> { ["Finalize JSOX builders into React elements."] }
+    <p> {
+      .className = "lede"
+      ["The react namespace builds a mutable object inside each scope, then finalize turns it into an immutable React element. Hooks and reconciliation remain entirely React's job."]
+    }
+    [mount]
+  }
+  view.addEventListener("jsox:dispose", () => root.unmount(), { once: true });
+  return withSource(view, source, "React tree and namespace adapter");
+}

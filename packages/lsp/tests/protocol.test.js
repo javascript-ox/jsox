@@ -1,7 +1,9 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 
 const cli = fileURLToPath(new URL("../src/cli.js", import.meta.url));
@@ -104,6 +106,7 @@ describe("jsox-lsp protocol", () => {
         clientInfo: { name: "jsox-lsp-test" },
       });
       assert.equal(init.serverInfo?.name, "JSOX");
+      assert.equal(init.serverInfo?.version, "0.2.0");
       assert.equal(init.capabilities.hoverProvider, true);
       assert.equal(init.capabilities.completionProvider.triggerCharacters.includes("."), true);
       assert.deepEqual(init.capabilities.semanticTokensProvider.full, { delta: false });
@@ -143,6 +146,55 @@ describe("jsox-lsp protocol", () => {
         textDocument: { uri },
       });
       assert.ok(semantic.data.length > 0);
+    } finally {
+      await server.shutdown();
+    }
+  });
+
+  it("loads namespace typing from the workspace config", async (t) => {
+    const dir = await mkdtemp(path.join(tmpdir(), "jsox-lsp-config-"));
+    t.after(() => rm(dir, { recursive: true, force: true }));
+    await writeFile(
+      path.join(dir, "jsox.config.js"),
+      `module.exports = {
+  defaultNamespace: "react",
+  namespaceHandlers: {
+    react(tag) { return "new " + tag + "()"; }
+  }
+};
+`,
+    );
+
+    const server = startServer();
+    try {
+      await server.request("initialize", {
+        processId: process.pid,
+        rootUri: pathToFileURL(dir).href,
+        capabilities: {},
+        clientInfo: { name: "jsox-lsp-config-test" },
+      });
+      server.notify("initialized", {});
+
+      const file = path.join(dir, "view.jsox");
+      const uri = pathToFileURL(file).href;
+      const text = `class MyReactElement {
+  activate() {}
+}
+const element = <MyReactElement> {
+  .activate()
+};
+`;
+      server.notify("textDocument/didOpen", {
+        textDocument: { uri, languageId: "jsox", version: 1, text },
+      });
+      const diagnostics = await server.waitFor("textDocument/publishDiagnostics");
+      assert.deepEqual(diagnostics.params.diagnostics, []);
+
+      const hover = await server.request("textDocument/hover", {
+        textDocument: { uri },
+        position: { line: 3, character: 7 },
+      });
+      assert.match(hover?.contents?.value ?? "", /MyReactElement/);
     } finally {
       await server.shutdown();
     }

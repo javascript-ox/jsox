@@ -1,0 +1,81 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import {
+  constructTable,
+  createSortedRowModel,
+  rowSortingFeature,
+  sortFns,
+  tableFeatures,
+} from "@tanstack/table-core";
+import { storeReactivityBindings } from "@tanstack/table-core/store-reactivity-bindings";
+
+export function TanStackTableExample() {
+  const data = [
+    { name: "Compiler", kind: "Core", status: "Published", tests: 91 },
+    { name: "LSP", kind: "Tooling", status: "Published", tests: 14 },
+    { name: "Web Components", kind: "Frontend", status: "Published", tests: 5 },
+    { name: "Examples", kind: "Gallery", status: "Growing", tests: 15 },
+  ];
+  const columns = [
+    { accessorKey: "name", header: "Package" },
+    { accessorKey: "kind", header: "Area" },
+    { accessorKey: "status", header: "Status" },
+    { accessorKey: "tests", header: "Tests" },
+  ];
+  const features = tableFeatures({
+    coreReactivityFeature: storeReactivityBindings(),
+    rowSortingFeature,
+    sortedRowModel: createSortedRowModel(),
+    sortFns,
+  });
+  const options = {};
+  [options] { .features = features; .columns = columns; .data = data }
+  const model = constructTable(options);
+  const tableEl = <table> { .className = "tanstack-table" }
+
+  const render = () => {
+    [tableEl] {
+      .replaceChildren()
+      <thead> {
+        for (const group of model.getHeaderGroups()) {
+          <tr> {
+            for (const header of group.headers) {
+              <th> {
+                const sorted = header.column.getIsSorted()
+                <button> {
+                  .type = "button"
+                  .disabled = !header.column.getCanSort()
+                  .onclick = header.column.getToggleSortingHandler()
+                  [String(header.column.columnDef.header)]
+                  [sorted === "asc" ? " ↑" : sorted === "desc" ? " ↓" : " ↕"]
+                }
+              }
+            }
+          }
+        }
+      }
+      <tbody> {
+        for (const row of model.getRowModel().rows) {
+          <tr> {
+            for (const cell of row.getAllCells()) {
+              <td> { [String(cell.getValue())] }
+            }
+          }
+        }
+      }
+    }
+  };
+  const unsubscribe = model.store.subscribe(render);
+  render();
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["TanStack UI · Table"] }
+    <h1> { ["Headless table state, fully owned markup."] }
+    <p> { .className = "lede"; ["TanStack Table owns sorting and row models. JSOX constructs every table, row, header, cell, and control from those models."] }
+    <section> { .className = "panel table-scroll"; [tableEl] }
+  }
+  root.addEventListener("jsox:dispose", unsubscribe, { once: true });
+  return withSource(root, source);
+}

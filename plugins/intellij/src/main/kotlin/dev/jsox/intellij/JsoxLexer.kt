@@ -73,6 +73,10 @@ class JsoxLexer : LexerBase() {
       c == '<' && tokenStart + 1 < end && isIdentStart(buffer[tokenStart + 1]) -> {
         var i = tokenStart + 2
         while (i < end && (isIdentPart(buffer[i]) || buffer[i] == '-')) i++
+        if (i < end && buffer[i] == ':' && i + 1 < end && isIdentStart(buffer[i + 1])) {
+          i += 2
+          while (i < end && (isIdentPart(buffer[i]) || buffer[i] == '-')) i++
+        }
         if (i < end && buffer[i] == '>') emit(JsoxTokenTypes.TAG, i + 1)
         else emit(JsoxTokenTypes.PUNCT, tokenStart + 1)
       }

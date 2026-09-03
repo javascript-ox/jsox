@@ -1,16 +1,70 @@
+function createHtmlElement(tag) {
+  return `document.createElement(${JSON.stringify(tag)})`;
+}
+
+function createSvgElement(tag) {
+  return `document.createElementNS("http://www.w3.org/2000/svg", ${JSON.stringify(tag)})`;
+}
+
+const NAMESPACE_NAME = /^[A-Za-z][\w-]*$/;
+
 /** Default child-insert methods: DOM, arrays, then Set-like. */
 export const defaultConfig = {
-  create(tag) {
-    return `document.createElement(${JSON.stringify(tag)})`;
+  create: createHtmlElement,
+  namespaceHandlers: {
+    html: createHtmlElement,
+    svg: createSvgElement,
   },
+  defaultNamespace: "html",
   childMethods: ["append", "push", "add"],
   childHelperName: "$child",
   strict: false,
 };
 
 export function normalizeConfig(input = {}) {
-  const create =
+  const legacyCreate =
     typeof input.create === "function" ? input.create : defaultConfig.create;
+  const suppliedNamespaces = input.namespaceHandlers ?? {};
+  if (
+    suppliedNamespaces === null ||
+    typeof suppliedNamespaces !== "object" ||
+    Array.isArray(suppliedNamespaces)
+  ) {
+    throw new TypeError("config.namespaceHandlers must be an object of namespace handlers");
+  }
+  const namespaceHandlers = {
+    ...defaultConfig.namespaceHandlers,
+    html: legacyCreate,
+  };
+  for (const [namespace, factory] of Object.entries(suppliedNamespaces)) {
+    if (!NAMESPACE_NAME.test(namespace)) {
+      throw new TypeError(`Invalid tag namespace ${JSON.stringify(namespace)}`);
+    }
+    const validObject =
+      factory !== null &&
+      typeof factory === "object" &&
+      !Array.isArray(factory) &&
+      typeof factory.create === "function" &&
+      (factory.finalize === undefined || typeof factory.finalize === "function");
+    if (typeof factory !== "function" && !validObject) {
+      throw new TypeError(
+        `config.namespaceHandlers.${namespace} must be a function or an object with create() and optional finalize() functions`,
+      );
+    }
+    namespaceHandlers[namespace] = factory;
+  }
+  const defaultNamespace =
+    input.defaultNamespace === undefined
+      ? defaultConfig.defaultNamespace
+      : String(input.defaultNamespace);
+  if (!NAMESPACE_NAME.test(defaultNamespace)) {
+    throw new TypeError("config.defaultNamespace must be a valid namespace name");
+  }
+  if (!Object.hasOwn(namespaceHandlers, defaultNamespace)) {
+    throw new TypeError(
+      `config.defaultNamespace references unknown tag namespace ${JSON.stringify(defaultNamespace)}`,
+    );
+  }
   const childMethods = Array.isArray(input.childMethods)
     ? input.childMethods.map(String)
     : [...defaultConfig.childMethods];
@@ -19,7 +73,14 @@ export function normalizeConfig(input = {}) {
       ? input.childHelperName
       : defaultConfig.childHelperName;
   const strict = Boolean(input.strict);
-  return { create, childMethods, childHelperName, strict };
+  return {
+    create: namespaceHandlers.html,
+    namespaceHandlers,
+    defaultNamespace,
+    childMethods,
+    childHelperName,
+    strict,
+  };
 }
 
 export async function loadConfig(dir = process.cwd()) {

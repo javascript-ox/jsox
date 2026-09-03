@@ -2,7 +2,7 @@ name: GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
@@ -18,17 +18,47 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out stable
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          path: stable
+      - name: Check out development
+        uses: actions/checkout@v7
+        with:
+          ref: develop
+          path: development
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run build:site
-      - uses: actions/upload-pages-artifact@v3
+          cache-dependency-path: |
+            stable/package-lock.json
+            development/package-lock.json
+      - name: Build stable
+        working-directory: stable
+        env:
+          VITE_JSOX_CHANNEL: stable
+        run: |
+          npm ci
+          npm test
+          npm run build:site
+      - name: Build development
+        working-directory: development
+        env:
+          VITE_JSOX_CHANNEL: develop
+        run: |
+          npm ci
+          npm test
+          npm run build:site
+      - name: Assemble both channels
+        run: |
+          mkdir -p publish/develop
+          cp -R stable/_site/. publish/
+          cp -R development/_site/. publish/develop/
+      - uses: actions/upload-pages-artifact@v5
         with:
-          path: _site
+          path: publish
 
   deploy:
     needs: build
@@ -38,4 +68,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
