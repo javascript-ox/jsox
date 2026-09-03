@@ -1,0 +1,5 @@
+import { EffectExample } from "./view.jsox";
+
+[document.body] {
+  [EffectExample()]
+}

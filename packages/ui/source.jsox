@@ -1,0 +1,13 @@
+export function SourcePanel(source, label = "JSOX source") {
+  return <details> {
+    .className = "source-panel code-pane"
+    .open = true
+    <summary> { [label] }
+    <pre> { .className = "code"; [source.trim()] }
+  }
+}
+
+export function withSource(view, source, label) {
+  [view] { [SourcePanel(source, label)] }
+  return view;
+}

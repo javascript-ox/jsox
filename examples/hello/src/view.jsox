@@ -1,7 +1,9 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 
 export function Hello() {
-  return <main> {
+  const root = <main> {
     .className = "wrap"
     <p> { .className = "kicker"; ["Hello"] }
     <h1> { ["JSOX"] }
@@ -18,4 +20,5 @@ export function Hello() {
       }
     }
   }
+  return withSource(root, source);
 }

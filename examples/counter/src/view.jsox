@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 
 export function Counter() {
   let count = 0;
@@ -13,7 +15,7 @@ export function Counter() {
     valueEl.textContent = String(count);
   }
 
-  return <main> {
+  const root = <main> {
     .className = "wrap"
     <p> { .className = "kicker"; ["Counter"] }
     <h1> { ["Plus and minus"] }
@@ -48,4 +50,5 @@ export function Counter() {
       }
     }
   }
+  return withSource(root, source);
 }

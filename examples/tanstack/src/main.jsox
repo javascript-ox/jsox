@@ -1,0 +1,3 @@
+import { TanStackExample } from "./view.jsox";
+
+[document.body] { [TanStackExample()] }

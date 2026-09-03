@@ -1,0 +1,3 @@
+import { AlpineExample } from "./view.jsox";
+
+[document.body] { [AlpineExample()] }

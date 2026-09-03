@@ -1,0 +1,3 @@
+import { D3Example } from "./view.jsox";
+
+[document.body] { [D3Example()] }

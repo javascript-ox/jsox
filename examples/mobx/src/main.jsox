@@ -1,0 +1,3 @@
+import { MobxExample } from "./view.jsox";
+
+[document.body] { [MobxExample()] }

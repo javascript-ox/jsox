@@ -1,0 +1,59 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { QueryClient, QueryObserver } from "@tanstack/query-core";
+
+const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+export function TanStackExample() {
+  const client = new QueryClient();
+  const query = {};
+  [query] {
+    .queryKey = ["jsox", "release"]
+    .staleTime = 10_000
+    .queryFn = async function () {
+      await pause(450);
+      return {
+        version: "0.1.1",
+        channel: "develop",
+        checkedAt: new Date().toLocaleTimeString(),
+      };
+    }
+  }
+  const observer = new QueryObserver(client, query);
+  const status = <strong> { .className = "query-status"; ["Loading…"] }
+  const details = <dl> { .className = "query-details" }
+  const refresh = <button> { .type = "button"; .className = "btn btn-accent"; ["Refetch"] }
+  refresh.onclick = () => observer.refetch();
+
+  const unsubscribe = observer.subscribe((result) => {
+    status.textContent = result.isFetching ? "Fetching…" : result.status;
+    refresh.disabled = result.isFetching;
+    if (!result.data) return;
+    const rows = [
+      ["Version", result.data.version],
+      ["Channel", result.data.channel],
+      ["Checked", result.data.checkedAt],
+    ];
+    [details] {
+      .replaceChildren()
+      for (const [term, value] of rows) {
+        <dt> { [term] }
+        <dd> { [value] }
+      }
+    }
+  });
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["TanStack Query Core"] }
+    <h1> { ["Server state without a UI adapter."] }
+    <p> { .className = "lede"; ["JSOX constructs the query options and concrete result view. TanStack Query Core owns fetching, caching, freshness, and refetch state."] }
+    <section> { .className = "panel query-demo"; [status]; [details]; [refresh] }
+  }
+  root.addEventListener("jsox:dispose", () => {
+    unsubscribe();
+    client.clear();
+  }, { once: true });
+  return withSource(root, source);
+}
