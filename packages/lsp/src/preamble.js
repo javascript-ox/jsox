@@ -4,13 +4,15 @@ import { EL, SCOPE } from "@js-ox/compiler/splice";
 export const PREAMBLE = `/**
  * @template {string | null} N
  * @template {string} K
+ * @template T
  * @param {N} namespace
  * @param {K} tag
- * @param {function(this: N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element): void} [init]
- * @returns {N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element}
+ * @param {T} witness
+ * @param {function(this: T extends null ? N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element : T): void} [init]
+ * @returns {T extends null ? N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element : T}
  */
-function ${EL}(namespace, tag, init) {
-  return /** @type {N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element} */ (/** @type {unknown} */ (undefined));
+function ${EL}(namespace, tag, witness, init) {
+  return /** @type {T extends null ? N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element : T} */ (/** @type {unknown} */ (undefined));
 }
 
 /**

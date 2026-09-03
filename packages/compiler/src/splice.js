@@ -145,7 +145,9 @@ function tryTag(tokens, i, opts) {
   if (tokens[j]?.value !== ">") return null;
   j++;
   const namespaceArg = namespace === null ? "null" : JSON.stringify(namespace);
-  const args = `${namespaceArg}, ${JSON.stringify(name)}`;
+  const witness = opts?.typeWitness?.(namespace, name);
+  const witnessArg = typeof witness === "string" ? witness : "null";
+  const args = `${namespaceArg}, ${JSON.stringify(name)}, ${witnessArg}`;
   const k = skipWs(tokens, j);
   if (tokens[k]?.value === "{") {
     const block = takeBalanced(tokens, k, "{", "}", opts?.recover);

@@ -48,15 +48,15 @@ const { code } = compile(source);
 Optional `jsox.config.js` in the project root can override:
 
 - `create(tag)`, which returns the JavaScript expression used to create a tag
-- `tagHandlers`, an object mapping `<>` namespaces to handler functions
+- `namespaceHandlers`, an object mapping `<>` namespaces to factory functions
 - `defaultNamespace` (`html` by default), used for tags without a namespace
 - `childMethods` (`append`, `push`, `add` by default)
 - `childHelperName` (`$child` by default; must be a valid JavaScript identifier); the compiler adds a numeric suffix if that name is already bound in the source
 
 ## Scoped tags
 
-Use `<namespace:tag>` to select a construction handler. JSOX includes `html`
-and `svg` handlers, so SVG trees can use the correct DOM namespace directly:
+Use `<namespace:tag>` to select a namespace factory. JSOX includes `html`
+and `svg` factories, so SVG trees can use the correct DOM namespace directly:
 
 ```js
 const icon = <svg:svg> {
@@ -69,13 +69,13 @@ const icon = <svg:svg> {
 }
 ```
 
-Register project-specific handlers in `jsox.config.js`. Each handler receives
+Register project-specific factories in `jsox.config.js`. Each factory receives
 the local tag name and context, then returns a JavaScript expression string
 that constructs the target:
 
 ```js
 export default {
-  tagHandlers: {
+  namespaceHandlers: {
     view(tag, { namespace, explicitNamespace, qualifiedName }) {
       return `createView(${JSON.stringify(tag)})`;
     },
@@ -85,8 +85,13 @@ export default {
 ```
 
 With that configuration, `<card>` and `<view:card>` both use the `view`
-handler. `<html:button>` and `<svg:circle>` can still select the built-in
-handlers explicitly.
+factory. `<html:button>` and `<svg:circle>` can still select the built-in
+factories explicitly.
 
 The existing `create(tag)` option remains supported and configures the built-in
 `html` handler for backward compatibility.
+
+The language server loads the same configuration and uses a namespace
+factory's returned expression for TypeScript inference. Adding namespaces does
+not change unqualified HTML typing unless `defaultNamespace` is explicitly set
+to another namespace.

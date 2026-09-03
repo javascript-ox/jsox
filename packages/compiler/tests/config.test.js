@@ -19,8 +19,8 @@ describe("loadConfig", () => {
     assert.equal(config.childHelperName, defaultConfig.childHelperName);
     assert.equal(config.strict, defaultConfig.strict);
     assert.equal(config.defaultNamespace, "html");
-    assert.equal(typeof config.tagHandlers.html, "function");
-    assert.equal(typeof config.tagHandlers.svg, "function");
+    assert.equal(typeof config.namespaceHandlers.html, "function");
+    assert.equal(typeof config.namespaceHandlers.svg, "function");
   });
 
   it("propagates a missing dependency from an existing config", async (t) => {
@@ -37,14 +37,14 @@ describe("loadConfig", () => {
     });
   });
 
-  it("validates tag handler configuration", () => {
+  it("validates namespace factory configuration", () => {
     assert.throws(
-      () => normalizeConfig({ tagHandlers: { "not:valid": () => "x" } }),
+      () => normalizeConfig({ namespaceHandlers: { "not:valid": () => "x" } }),
       /Invalid tag namespace/,
     );
     assert.throws(
-      () => normalizeConfig({ tagHandlers: { view: "makeView" } }),
-      /config\.tagHandlers\.view must be a function/,
+      () => normalizeConfig({ namespaceHandlers: { view: "makeView" } }),
+      /config\.namespaceHandlers\.view must be a function/,
     );
     assert.throws(
       () => normalizeConfig({ defaultNamespace: "view" }),

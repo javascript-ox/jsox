@@ -9,6 +9,7 @@ import {
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import ts from "typescript";
+import { loadConfig } from "@js-ox/compiler";
 import { createJsService } from "./js-service.js";
 import { tagCompletions } from "./tags.js";
 
@@ -38,7 +39,7 @@ const SEMANTIC_TOKEN_MODIFIERS = [
 export function start() {
   const connection = createConnection(process.stdin, process.stdout);
   const documents = new TextDocuments(TextDocument);
-  const js = createJsService();
+  let js = createJsService();
 
   function pathOf(uri) {
     if (uri.startsWith("file:")) return fileURLToPath(uri);
@@ -49,23 +50,35 @@ export function start() {
     return doc.positionAt(Math.max(0, Math.min(offset, doc.getText().length)));
   }
 
-  connection.onInitialize(() => ({
-    capabilities: {
-      textDocumentSync: TextDocumentSyncKind.Incremental,
-      completionProvider: { triggerCharacters: [".", "<"] },
-      hoverProvider: true,
-      definitionProvider: true,
-      signatureHelpProvider: { triggerCharacters: ["(", ","] },
-      semanticTokensProvider: {
-        legend: {
-          tokenTypes: SEMANTIC_TOKEN_TYPES,
-          tokenModifiers: SEMANTIC_TOKEN_MODIFIERS,
+  connection.onInitialize(async (params) => {
+    const rootUri = params.workspaceFolders?.[0]?.uri ?? params.rootUri;
+    if (rootUri?.startsWith("file:")) {
+      try {
+        js = createJsService(await loadConfig(fileURLToPath(rootUri)));
+      } catch (error) {
+        connection.console.error(
+          `Unable to load jsox.config.js: ${error?.message ?? String(error)}`,
+        );
+      }
+    }
+    return {
+      capabilities: {
+        textDocumentSync: TextDocumentSyncKind.Incremental,
+        completionProvider: { triggerCharacters: [".", "<"] },
+        hoverProvider: true,
+        definitionProvider: true,
+        signatureHelpProvider: { triggerCharacters: ["(", ","] },
+        semanticTokensProvider: {
+          legend: {
+            tokenTypes: SEMANTIC_TOKEN_TYPES,
+            tokenModifiers: SEMANTIC_TOKEN_MODIFIERS,
+          },
+          full: { delta: false },
         },
-        full: { delta: false },
       },
-    },
-    serverInfo: { name: "JSOX", version: "0.2.0" },
-  }));
+      serverInfo: { name: "JSOX", version: "0.2.0" },
+    };
+  });
 
   const diagTimers = new Map();
 
@@ -147,7 +160,9 @@ export function start() {
     const doc = documents.get(params.textDocument.uri);
     if (!doc) return null;
     const orig = doc.offsetAt(params.position);
-    const tags = tagCompletions(doc.getText(), orig);
+    const tags = tagCompletions(doc.getText(), orig, {
+      namespaces: Object.keys(js.config.namespaceHandlers),
+    });
     if (tags?.length) return tags;
     const fileName = pathOf(doc.uri);
     const entry = js.get(fileName) || js.upsert(fileName, doc.getText());

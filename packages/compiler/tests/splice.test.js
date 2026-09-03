@@ -4,22 +4,22 @@ import { splice, spliceWithMap, origToGen, genToOrig, EL, SCOPE } from "../src/s
 
 describe("splice: <tag>", () => {
   it("rewrites a bare tag", () => {
-    assert.equal(splice("<div>").trim(), `${EL}(null, "div")`);
+    assert.equal(splice("<div>").trim(), `${EL}(null, "div", null)`);
   });
 
   it("rewrites a tag with a block", () => {
     const out = splice("<div> { }");
-    assert.match(out, new RegExp(`${EL}\\(null, "div", function\\(\\)\\{`));
+    assert.match(out, new RegExp(`${EL}\\(null, "div", null, function\\(\\)\\{`));
   });
 
   it("allows hyphenated custom elements", () => {
-    assert.equal(splice("<my-widget>").trim(), `${EL}(null, "my-widget")`);
+    assert.equal(splice("<my-widget>").trim(), `${EL}(null, "my-widget", null)`);
   });
 
   it("rewrites namespaced tags", () => {
     assert.equal(
       splice("<svg:linear-gradient>").trim(),
-      `${EL}("svg", "linear-gradient")`,
+      `${EL}("svg", "linear-gradient", null)`,
     );
   });
 
@@ -50,8 +50,19 @@ describe("splice: <tag>", () => {
 
   it("nests tags", () => {
     const out = splice("<div> { <p> { } }");
-    assert.match(out, new RegExp(`${EL}\\(null, "div"`));
-    assert.match(out, new RegExp(`${EL}\\(null, "p"`));
+    assert.match(out, new RegExp(`${EL}\\(null, "div", null`));
+    assert.match(out, new RegExp(`${EL}\\(null, "p", null`));
+  });
+
+  it("accepts an LSP-only type witness", () => {
+    const out = spliceWithMap(`<react:MyButton>`, {
+      typeWitness(namespace, tag) {
+        assert.equal(namespace, "react");
+        assert.equal(tag, "MyButton");
+        return `React.createElement(MyButton)`;
+      },
+    }).code;
+    assert.match(out, /React\.createElement\(MyButton\)/);
   });
 });
 

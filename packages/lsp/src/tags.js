@@ -204,7 +204,7 @@ export function registeredComponentTags(source) {
   return [...tags].sort();
 }
 
-export function tagCompletions(source, offset) {
+export function tagCompletions(source, offset, options = {}) {
   const prefix = tagPrefix(source, offset);
   if (prefix == null) return null;
   const namespace = tagNamespace(source, offset);
@@ -215,11 +215,12 @@ export function tagCompletions(source, offset) {
     : namespace === null || namespace === "html"
       ? [...registered, ...HTML_TAGS]
       : [];
+  const namespaceNames = options.namespaces ?? ["html", "svg"];
   const namespaces = namespace === null
-    ? [
-        { label: "html:", detail: "HTML tag namespace" },
-        { label: "svg:", detail: "SVG tag namespace" },
-      ]
+    ? [...new Set(namespaceNames)].map((name) => ({
+        label: `${name}:`,
+        detail: `${name} tag namespace`,
+      }))
     : [];
   return [
     ...namespaces

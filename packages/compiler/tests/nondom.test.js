@@ -32,14 +32,14 @@ describe("non-dom", () => {
     assert.equal(obj[0], undefined);
   });
 
-  it("builds nested trees through a custom tag handler", () => {
+  it("builds nested trees through a custom namespace factory", () => {
     const { code } = compile(
       `globalThis.tree = <tree:branch> {
         .label = "root"
         <tree:leaf> { .label = "child" }
       }`,
       {
-        tagHandlers: {
+        namespaceHandlers: {
           tree: (tag) => `({ tag: ${JSON.stringify(tag)}, children: [], add(...items) { this.children.push(...items) } })`,
         },
       },

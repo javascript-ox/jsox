@@ -46,6 +46,48 @@ describe("js-service", () => {
     assert.match(text, /SVGCircleElement/);
   });
 
+  it("keeps unqualified tags typed as HTML when custom namespaces are added", () => {
+    const js = createJsService({
+      namespaceHandlers: {
+        react: (tag) => `new ${tag}()`,
+      },
+    });
+    const file = "/tmp/custom-with-html.jsox";
+    const source = `const el = <button> { .type = "button" };`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("el")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /HTMLButtonElement/);
+  });
+
+  it("infers custom default-namespace targets through TypeScript", () => {
+    const js = createJsService({
+      defaultNamespace: "react",
+      namespaceHandlers: {
+        react: (tag) => `new ${tag}()`,
+      },
+    });
+    const file = "/tmp/react-element.jsox";
+    const source = `class MyReactElement {
+  activate() {}
+}
+const element = <MyReactElement> {
+  .activate()
+};`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("element =")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /MyReactElement/);
+  });
+
   it("completes this-shorthand as element properties", () => {
     const js = createJsService();
     const file = "/tmp/props.jsox";
@@ -129,5 +171,12 @@ describe("tag completions", () => {
     const svg = tagCompletions("<svg:cir", 8);
     assert.deepEqual(svg.map((item) => item.label), ["circle"]);
     assert.equal(svg[0].detail, "SVG element");
+  });
+
+  it("suggests configured namespace names", () => {
+    const items = tagCompletions("<re", 3, {
+      namespaces: ["html", "svg", "react"],
+    });
+    assert.deepEqual(items.map((item) => item.label), ["react:"]);
   });
 });

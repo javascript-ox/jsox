@@ -11,7 +11,7 @@ const NAMESPACE_NAME = /^[A-Za-z][\w-]*$/;
 /** Default child-insert methods: DOM, arrays, then Set-like. */
 export const defaultConfig = {
   create: createHtmlElement,
-  tagHandlers: {
+  namespaceHandlers: {
     html: createHtmlElement,
     svg: createSvgElement,
   },
@@ -24,26 +24,26 @@ export const defaultConfig = {
 export function normalizeConfig(input = {}) {
   const legacyCreate =
     typeof input.create === "function" ? input.create : defaultConfig.create;
-  const suppliedHandlers = input.tagHandlers ?? {};
+  const suppliedNamespaces = input.namespaceHandlers ?? {};
   if (
-    suppliedHandlers === null ||
-    typeof suppliedHandlers !== "object" ||
-    Array.isArray(suppliedHandlers)
+    suppliedNamespaces === null ||
+    typeof suppliedNamespaces !== "object" ||
+    Array.isArray(suppliedNamespaces)
   ) {
-    throw new TypeError("config.tagHandlers must be an object of functions");
+    throw new TypeError("config.namespaceHandlers must be an object of functions");
   }
-  const tagHandlers = {
-    ...defaultConfig.tagHandlers,
+  const namespaceHandlers = {
+    ...defaultConfig.namespaceHandlers,
     html: legacyCreate,
   };
-  for (const [namespace, handler] of Object.entries(suppliedHandlers)) {
+  for (const [namespace, factory] of Object.entries(suppliedNamespaces)) {
     if (!NAMESPACE_NAME.test(namespace)) {
       throw new TypeError(`Invalid tag namespace ${JSON.stringify(namespace)}`);
     }
-    if (typeof handler !== "function") {
-      throw new TypeError(`config.tagHandlers.${namespace} must be a function`);
+    if (typeof factory !== "function") {
+      throw new TypeError(`config.namespaceHandlers.${namespace} must be a function`);
     }
-    tagHandlers[namespace] = handler;
+    namespaceHandlers[namespace] = factory;
   }
   const defaultNamespace =
     input.defaultNamespace === undefined
@@ -52,7 +52,7 @@ export function normalizeConfig(input = {}) {
   if (!NAMESPACE_NAME.test(defaultNamespace)) {
     throw new TypeError("config.defaultNamespace must be a valid namespace name");
   }
-  if (!Object.hasOwn(tagHandlers, defaultNamespace)) {
+  if (!Object.hasOwn(namespaceHandlers, defaultNamespace)) {
     throw new TypeError(
       `config.defaultNamespace references unknown tag namespace ${JSON.stringify(defaultNamespace)}`,
     );
@@ -66,8 +66,8 @@ export function normalizeConfig(input = {}) {
       : defaultConfig.childHelperName;
   const strict = Boolean(input.strict);
   return {
-    create: tagHandlers.html,
-    tagHandlers,
+    create: namespaceHandlers.html,
+    namespaceHandlers,
     defaultNamespace,
     childMethods,
     childHelperName,

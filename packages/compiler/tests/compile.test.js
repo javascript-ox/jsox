@@ -156,10 +156,10 @@ describe("compile: config", () => {
     );
   });
 
-  it("uses a handler selected by an explicit tag namespace", () => {
+  it("uses a factory selected by an explicit namespace", () => {
     let received;
     const code = js(`<view:card>`, {
-      tagHandlers: {
+      namespaceHandlers: {
         view(tag, context) {
           received = { tag, ...context };
           return `makeView(${JSON.stringify(tag)})`;
@@ -178,7 +178,7 @@ describe("compile: config", () => {
   it("uses the configured default namespace for unqualified tags", () => {
     const code = js(`<card>`, {
       defaultNamespace: "view",
-      tagHandlers: {
+      namespaceHandlers: {
         view: (tag) => `makeView(${JSON.stringify(tag)})`,
       },
     });
@@ -188,7 +188,7 @@ describe("compile: config", () => {
 
   it("supports mixed namespaces in nested trees", () => {
     const code = js(`<section> { <view:card> }`, {
-      tagHandlers: {
+      namespaceHandlers: {
         view: (tag) => `makeView(${JSON.stringify(tag)})`,
       },
     });
@@ -211,10 +211,10 @@ describe("compile: config", () => {
     );
   });
 
-  it("requires handlers to return JavaScript expression strings", () => {
+  it("requires namespace factories to return JavaScript expression strings", () => {
     assert.throws(
-      () => js(`<view:card>`, { tagHandlers: { view: () => ({}) } }),
-      /config\.tagHandlers\["view"\]\(\) must return a JavaScript expression string/,
+      () => js(`<view:card>`, { namespaceHandlers: { view: () => ({}) } }),
+      /config\.namespaceHandlers\["view"\]\(\) must return a JavaScript expression string/,
     );
   });
 });

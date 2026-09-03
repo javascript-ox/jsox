@@ -19,14 +19,23 @@ Or `npx jsox-lsp` after the workspace is installed (`npm run lsp` from the repo 
 - Go to definition (including DOM lib types)
 - Signature help
 - Diagnostics from TypeScript `checkJs`
-- Scoped-tag completions and typing for the built-in `html` and `svg` namespaces
+- Scoped-tag completions, semantic coloring, and TypeScript-backed typing
 
 Scoped tags use `<namespace:tag>`. For example, `<svg:circle>` is understood as
 an `SVGCircleElement`, while unqualified tags and `<html:button>` retain their
-HTML element types. Custom compiler namespaces are accepted as generic
-`Element` values.
+HTML element types. The server loads `jsox.config.js` from the workspace root,
+so `defaultNamespace` and custom namespace names match the compiler.
 
-Syntax coloring stays with the editor (VS Code TextMate grammar). The server does intelligence.
+For a custom namespace, the factory's creation expression is added to the
+virtual TypeScript program as a type witness. TypeScript therefore infers the
+real result without a separate type registry. For example, a factory that
+returns `new MyReactElement()` makes `<MyReactElement> {}` use
+`MyReactElement` for hover, completion, diagnostics, and `this` inside the
+block.
+
+Base syntax coloring stays with the editor. The server adds semantic
+classifications for constructs such as namespace scopes, functions, and
+properties.
 
 ## VS Code
 

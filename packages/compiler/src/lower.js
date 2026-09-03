@@ -249,20 +249,20 @@ function lowerEl(node, ctx) {
     throw new SyntaxError(`${EL}() requires a string tag name`);
   }
   const resolvedNamespace = namespace ?? ctx.config.defaultNamespace;
-  const handler = ctx.config.tagHandlers[resolvedNamespace];
-  if (typeof handler !== "function") {
+  const factory = ctx.config.namespaceHandlers[resolvedNamespace];
+  if (typeof factory !== "function") {
     throw new SyntaxError(`Unknown tag namespace ${JSON.stringify(resolvedNamespace)}`);
   }
-  const label = `config.tagHandlers[${JSON.stringify(resolvedNamespace)}]()`;
+  const label = `config.namespaceHandlers[${JSON.stringify(resolvedNamespace)}]()`;
   const created = parseExpr(
-    handler(tag, {
+    factory(tag, {
       namespace: resolvedNamespace,
       explicitNamespace: namespace,
       qualifiedName: `${resolvedNamespace}:${tag}`,
     }),
     label,
   );
-  const fn = node.arguments[2];
+  const fn = node.arguments[3];
   let expr;
   if (!fn) {
     expr = created;
