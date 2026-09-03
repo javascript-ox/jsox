@@ -76,6 +76,12 @@ export function createJsoxSession(config = {}) {
     completions(fileName, orig, source) {
       const tags = tagCompletions(source, orig, {
         namespaces: Object.keys(js.config.namespaceHandlers),
+        namespaceTags: Object.fromEntries(
+          Object.entries(js.config.namespaceHandlers).map(([name, handler]) => [
+            name,
+            typeof handler === "object" ? handler.tags ?? [] : [],
+          ]),
+        ),
       });
       if (tags?.length) {
         return tags.map((t) => ({
@@ -87,7 +93,10 @@ export function createJsoxSession(config = {}) {
       }
       const at = mapped(fileName, orig);
       if (!at) return [];
-      const info = js.completions(fileName, at.gen);
+      const info = js.completions(
+        fileName,
+        js.origOffsetToGen(at.entry, orig, true),
+      );
       if (!info?.entries?.length) return [];
       return info.entries
         .filter((item) => !item.name.startsWith("__jsox_"))

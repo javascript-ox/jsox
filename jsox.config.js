@@ -5,6 +5,11 @@ function componentExpression(tag) {
 export default {
   namespaceHandlers: {
     react: {
+      tags: ["article", "button", "div", "h2", "p", "CounterCard", "Box", "Button", "Card", "CardContent", "Chip", "LinearProgress", "Stack", "Typography", "ReleaseDashboard"],
+      types: {
+        target: "ReactNodeBuilder",
+        result: "React.ReactElement",
+      },
       create(tag) {
         return `new ReactNodeBuilder(${componentExpression(tag)})`;
       },
@@ -13,6 +18,11 @@ export default {
       },
     },
     vue: {
+      tags: ["article", "button", "div", "h2", "p", "VueCounter", "Button", "Card", "ProgressBar", "Tag", "DeploymentPanel"],
+      types: {
+        target: "VueNodeBuilder",
+        result: 'import("vue").VNode',
+      },
       create(tag) {
         return `new VueNodeBuilder(${componentExpression(tag)})`;
       },
@@ -20,5 +30,10 @@ export default {
         return `finalizeVueNode(${target})`;
       },
     },
+    test: {
+      create(tag) {
+        return '';
+      }
+    }
   },
 };

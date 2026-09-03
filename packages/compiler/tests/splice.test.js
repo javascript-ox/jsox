@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { splice, spliceWithMap, origToGen, genToOrig, EL, SCOPE } from "../src/splice.js";
+import { splice, spliceWithMap, origToGen, origCursorToGen, genToOrig, EL, SCOPE } from "../src/splice.js";
 
 describe("splice: <tag>", () => {
   it("rewrites a bare tag", () => {
@@ -161,6 +161,13 @@ describe("spliceWithMap", () => {
     const source = `<h> {\n  .`;
     const result = spliceWithMap(source, { incompleteThis: true, recover: true });
     const generated = origToGen(result.maps, source.length);
+    assert.equal(result.code.slice(generated - 5, generated), "this.");
+  });
+
+  it("prefers a shorthand endpoint inside a completed selector", () => {
+    const source = `<div> {\n  .\n  .style = {}\n}`;
+    const result = spliceWithMap(source, { incompleteThis: true, recover: true });
+    const generated = origCursorToGen(result.maps, source.indexOf(".\n") + 1);
     assert.equal(result.code.slice(generated - 5, generated), "this.");
   });
 });

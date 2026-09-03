@@ -106,10 +106,11 @@ mapping positions through JSOX syntax.
 The [example gallery](https://javascript-ox.github.io/jsox/) includes basic DOM
 and plain-object examples as well as integrations with:
 
-- React, Vue, Alpine, HTMX, Stimulus, and native Web Components
+- React, Vue, Svelte, Solid, Alpine, HTMX, Stimulus, and native Web Components
+- Material UI, PrimeVue, Lit, and shadcn/ui-style primitives
 - RxJS, Effect, XState, MobX, and Zod
 - Three.js, D3, Chart.js, GSAP, and SortableJS
-- TanStack Query, TanStack Table, and shadcn/ui-style primitives
+- TanStack Query and TanStack Table
 
 Every example displays the JSOX source responsible for its core behavior.
 
@@ -147,6 +148,11 @@ result such as a React element or Vue VNode:
 export default {
   namespaceHandlers: {
     react: {
+      tags: ["article", "button", "CounterCard"],
+      types: {
+        target: "ReactNodeBuilder",
+        result: "React.ReactElement",
+      },
       create: tag => `new ReactNodeBuilder(${tag})`,
       finalize: target => `finalizeReactNode(${target})`,
     },
@@ -154,8 +160,11 @@ export default {
 };
 ```
 
-The creation expression types `this` inside the block; the finalization
-expression types the completed selector. See the standalone
+`tags` supplies completion items after `<react:`. The optional TypeScript
+metadata explicitly types `this` inside the block and the completed selector;
+each hint may also be a `(tag, context) => typeString` function. Without these
+hints, the LSP continues to infer types from the creation and finalization
+expressions. See the standalone
 [`React`](examples/react) and [`Vue`](examples/vue) examples.
 
 ## Web Components
@@ -192,7 +201,7 @@ current construction model:
 - [x] Compiler, LSP, documentation, and backward-compatibility coverage
 
 Follow the detailed checklist in
-[issue #19](https://github.com/javascript-ox/jsox/issues/19). This work is
+[issue #19](https://github.com/javascript-ox/jsox/issues/19). This work
 provides a clean foundation for richer integrations—including React and
 Vue—without coupling the compiler to a particular framework.
 

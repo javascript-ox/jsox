@@ -1,6 +1,6 @@
 {
   "name": "@js-ox/compiler",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "JSOX compiler — JavaScript Object eXtensions, a dialect for constructing objects",
   "license": "MIT",
   "type": "module",

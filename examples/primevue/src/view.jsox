@@ -1,0 +1,67 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { computed, createApp, h, ref } from "vue";
+import PrimeVue from "primevue/config";
+import Aura from "@primeuix/themes/aura";
+import Button from "primevue/button";
+import Card from "primevue/card";
+import ProgressBar from "primevue/progressbar";
+import Tag from "primevue/tag";
+
+class VueNodeBuilder {
+  constructor(type) { this.type = type; }
+  props = {};
+  slots = {};
+  children = [];
+  add(...children) { this.children.push(...children); }
+}
+
+function finalizeVueNode(builder) {
+  if (typeof builder.type === "string") return h(builder.type, builder.props, builder.children);
+  const slots = Object.keys(builder.slots).length ? builder.slots : { default: () => builder.children };
+  return h(builder.type, builder.props, slots);
+}
+
+function DeploymentPanel() {
+  const completed = ref(3);
+  const total = 5;
+  const percent = computed(() => Math.round((completed.value / total) * 100));
+
+  return () => <vue:Card> {
+    .props.class = "prime-release-card"
+    .slots.title = () => <vue:div> {
+      .props.class = "button-row"
+      <vue:span> { ["Deployment readiness"] }
+      <vue:Tag> { .props.value = completed.value === total ? "Ready" : "In progress"; .props.severity = completed.value === total ? "success" : "info" }
+    }
+    .slots.subtitle = () => "PrimeVue slots are ordinary functions stored on the JSOX builder."
+    .slots.content = () => <vue:div> {
+      .props.class = "detailed-demo"
+      <vue:ProgressBar> { .props.value = percent.value }
+      <vue:p> { [`${completed.value} of ${total} release gates passed.`] }
+      <vue:div> {
+        .props.class = "button-row"
+        <vue:Button> { .props.label = "Reset"; .props.severity = "secondary"; .props.outlined = true; .props.onClick = () => completed.value = 0 }
+        <vue:Button> { .props.label = "Pass next gate"; .props.disabled = completed.value === total; .props.onClick = () => completed.value++ }
+      }
+    }
+  }
+}
+
+export function PrimeVueExample() {
+  const mount = <section> { .className = "primevue-mount" }
+  const app = createApp({ setup: DeploymentPanel });
+  app.use(PrimeVue, { theme: { preset: Aura } });
+  app.mount(mount);
+
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Detailed integration · Vue"] }
+    <h1> { ["PrimeVue components, JSOX structure."] }
+    <p> { .className = "lede"; ["JSOX builders collect component props, children, and named slots before finalizing them into Vue VNodes. Vue retains refs and dependency tracking."] }
+    [mount]
+  }
+  view.addEventListener("jsox:dispose", () => app.unmount(), { once: true });
+  return withSource(view, source, "PrimeVue VNode tree and slot adapter");
+}

@@ -33,6 +33,12 @@ creation type both inside and outside the block. For an object handler with
 `create` and `finalize`, `create` types `this` and block completions while
 `finalize` types the completed selector value.
 
+Custom handlers may declare `tags` to provide completions after their prefix,
+plus explicit `types.target` and `types.result` hints. Type hints may be strings
+or functions of `(tag, context)`, allowing per-tag types. Explicit hints take
+precedence over expression inference and are useful when runtime factory names
+are not imported into every JSOX file.
+
 Base syntax coloring stays with the editor. The server adds semantic
 classifications for constructs such as namespace scopes, functions, and
 properties.

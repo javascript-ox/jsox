@@ -186,6 +186,44 @@ const frontendIntegrations = [
   },
 ];
 
+const detailedIntegrations = [
+  {
+    href: "#/material-ui",
+    mark: "MUI",
+    markClass: "integration-mark-mui",
+    title: "React + Material UI",
+    blurb: "A realistic Material UI release dashboard whose entire React component tree is constructed with react: scopes.",
+  },
+  {
+    href: "#/primevue",
+    mark: "Pv",
+    markClass: "integration-mark-primevue",
+    title: "Vue + PrimeVue",
+    blurb: "PrimeVue cards, tags, progress, slots, and actions assembled as Vue VNodes from nested JSOX builders.",
+  },
+  {
+    href: "#/svelte",
+    mark: "S",
+    markClass: "integration-mark-svelte",
+    title: "Svelte",
+    blurb: "JSOX constructs structured application data and the mount boundary; Svelte's compiler owns the component interior. Yes, even Svelte.",
+  },
+  {
+    href: "#/solid",
+    mark: "◆",
+    markClass: "integration-mark-solid",
+    title: "Solid",
+    blurb: "Fine-grained Solid signals update references to concrete DOM nodes produced directly by JSOX.",
+  },
+  {
+    href: "#/lit",
+    mark: "Lit",
+    markClass: "integration-mark-lit",
+    title: "Lit",
+    blurb: "JSOX constructs and configures a reactive Lit custom element while Lit owns its encapsulated shadow-DOM template.",
+  },
+];
+
 const pillars = [
   {
     mark: "<tag>",
@@ -417,6 +455,37 @@ export function Home() {
                   [integration.mark]
                 }
                 <div> {
+                  <h2> { [integration.title] }
+                  <p> { [integration.blurb] }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      <div> {
+        .className = "examples-group examples-group-detailed"
+        <p> { .className = "kicker"; ["Detailed integrations"] }
+        <h2> { .className = "section-title"; ["Build something closer to the real thing."] }
+        <p> {
+          .className = "section-lede"
+          ["These demos go beyond a minimal counter. They show component libraries, framework lifecycle boundaries, reactive state, slots, and custom elements while keeping construction in JSOX wherever the host permits it."]
+        }
+        <ul> {
+          .className = "grid integration-grid detailed-integration-grid"
+          for (const integration of detailedIntegrations) {
+            <li> {
+              <a> {
+                .className = "card integration-card detailed-integration-card"
+                .href = integration.href
+                <span> {
+                  .className = `integration-mark ${integration.markClass}`
+                  .setAttribute("aria-hidden", "true")
+                  [integration.mark]
+                }
+                <div> {
+                  <p> { .className = "integration-depth"; ["Deep dive"] }
                   <h2> { [integration.title] }
                   <p> { [integration.blurb] }
                 }
