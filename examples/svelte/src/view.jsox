@@ -1,0 +1,32 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import jsoxSource from "./view.jsox?raw";
+import svelteSource from "./LaunchPanel.svelte?raw";
+import { mount, unmount } from "svelte";
+import LaunchPanel from "./LaunchPanel.svelte";
+
+export function SvelteExample() {
+  const release = {};
+  [release] {
+    .name = "JSOX 0.2"
+    .checks = []
+    [this.checks] {
+      [{ label: "Compiler suite", passed: true }]
+      [{ label: "LSP fixtures", passed: true }]
+      [{ label: "Browser examples", passed: false }]
+      [{ label: "Package provenance", passed: false }]
+    }
+  }
+
+  const mountPoint = <section> { .className = "svelte-mount" }
+  const component = mount(LaunchPanel, { target: mountPoint, props: { release } });
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Detailed integration · Svelte"] }
+    <h1> { ["A clean boundary between two compilers."] }
+    <p> { .className = "lede"; ["JSOX constructs the application data and mount point. Svelte owns its component source, runes, and updates—the boundary is explicit instead of pretending one compiler understands the other."] }
+    [mountPoint]
+  }
+  view.addEventListener("jsox:dispose", () => unmount(component), { once: true });
+  return withSource(view, `${jsoxSource}\n\n/* LaunchPanel.svelte */\n${svelteSource}`, "JSOX boundary and Svelte component");
+}

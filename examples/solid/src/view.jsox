@@ -1,0 +1,57 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { createEffect, createMemo, createSignal } from "solid-js";
+import { render } from "solid-js/web";
+
+function SolidDashboard() {
+  const [tests, setTests] = createSignal(84);
+  const [coverage, setCoverage] = createSignal(91);
+  const readiness = createMemo(() => Math.round((tests() + coverage()) / 2));
+
+  const testValue = <strong>;
+  const coverageValue = <strong>;
+  const readinessValue = <strong>;
+  const meter = <progress> { .className = "solid-progress"; .max = 100 }
+
+  createEffect(() => {
+    testValue.textContent = `${tests()}%`;
+    coverageValue.textContent = `${coverage()}%`;
+    readinessValue.textContent = `${readiness()}%`;
+    meter.value = readiness();
+  });
+
+  return <section> {
+    .className = "panel detailed-demo solid-release-card"
+    <div> {
+      <p> { .className = "kicker"; ["Fine-grained release signals"] }
+      <h2> { ["No component-tree rerender required."] }
+    }
+    <div> {
+      .className = "solid-metric-grid"
+      <div> { .className = "solid-metric"; <span> { ["Tests"] }; [testValue] }
+      <div> { .className = "solid-metric"; <span> { ["Coverage"] }; [coverageValue] }
+      <div> { .className = "solid-metric"; <span> { ["Readiness"] }; [readinessValue] }
+    }
+    [meter]
+    <div> {
+      .className = "button-row"
+      <button> { .type = "button"; .className = "btn"; .onclick = () => setTests((value) => Math.min(100, value + 4)); ["Run tests"] }
+      <button> { .type = "button"; .className = "btn btn-accent"; .onclick = () => setCoverage((value) => Math.min(100, value + 2)); ["Add coverage"] }
+    }
+  }
+}
+
+export function SolidExample() {
+  const mount = <section> { .className = "solid-mount" }
+  const dispose = render(() => SolidDashboard(), mount);
+  const view = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Detailed integration · Solid"] }
+    <h1> { ["Solid signals meet concrete JSOX nodes."] }
+    <p> { .className = "lede"; ["JSOX creates each DOM node once. Solid's signals and effects update only the captured values that depend on them."] }
+    [mount]
+  }
+  view.addEventListener("jsox:dispose", dispose, { once: true });
+  return withSource(view, source, "Solid signals over a JSOX DOM tree");
+}

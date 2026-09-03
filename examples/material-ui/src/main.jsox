@@ -1,0 +1,3 @@
+import { MaterialUiExample } from "./view.jsox";
+
+[document.body] { [MaterialUiExample()] }

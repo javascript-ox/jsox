@@ -1,6 +1,6 @@
 {
   "name": "@js-ox/lsp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Language server for JSOX — JavaScript intelligence plus dialect extras",
   "license": "MIT",
   "type": "module",
@@ -39,7 +39,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@js-ox/compiler": "^0.2.1",
+    "@js-ox/compiler": "^0.2.2",
     "typescript": "^5.8.2",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"

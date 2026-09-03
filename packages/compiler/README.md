@@ -94,6 +94,11 @@ target expression and returns an expression for the selector's final value:
 export default {
   namespaceHandlers: {
     react: {
+      tags: ["button", "card", "Button"],
+      types: {
+        target: "ReactElementBuilder",
+        result: "React.ReactElement",
+      },
       create(tag) {
         return `new ReactElementBuilder(${tag})`;
       },
@@ -117,6 +122,12 @@ finalized before it is inserted into its parent. Both callbacks run at compile
 time and must return JavaScript expression strings. `finalize` also receives a
 second context argument containing `tag`, `namespace`, `explicitNamespace`,
 and `qualifiedName`.
+
+The object form can also expose editor metadata. `tags` is an array of names
+offered by the LSP after the namespace prefix. `types.target` specifies the
+TypeScript type of `this` during construction, and `types.result` specifies the
+type returned after finalization. A type hint may be a string or a
+`(tag, context) => string` function. These fields do not affect emitted code.
 
 With that configuration, `<card>` and `<view:card>` both use the `view`
 factory. `<html:button>` and `<svg:circle>` can still select the built-in

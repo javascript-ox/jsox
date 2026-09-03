@@ -364,6 +364,21 @@ export function origToGen(maps, offset) {
   return Math.round(best.genStart + t * (best.genEnd - best.genStart));
 }
 
+/** Map an editor cursor, preferring a token ending at the cursor over enclosing rewrites. */
+export function origCursorToGen(maps, offset) {
+  let best = null;
+  for (const m of maps) {
+    if (offset >= m.origStart && offset <= m.origEnd) {
+      if (!best || m.origEnd - m.origStart < best.origEnd - best.origStart) best = m;
+    }
+  }
+  if (!best) return offset;
+  const olen = best.origEnd - best.origStart;
+  if (olen <= 0) return best.genStart;
+  const t = (offset - best.origStart) / olen;
+  return Math.round(best.genStart + t * (best.genEnd - best.genStart));
+}
+
 /** Map a spliced-JS offset back to original source. */
 export function genToOrig(maps, offset) {
   let best = null;

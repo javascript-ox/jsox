@@ -7,6 +7,11 @@ function createSvgElement(tag) {
 }
 
 const NAMESPACE_NAME = /^[A-Za-z][\w-]*$/;
+const TAG_NAME = /^[A-Za-z][\w-]*$/;
+
+function validTypeHint(hint) {
+  return hint === undefined || typeof hint === "string" || typeof hint === "function";
+}
 
 /** Default child-insert methods: DOM, arrays, then Set-like. */
 export const defaultConfig = {
@@ -40,15 +45,44 @@ export function normalizeConfig(input = {}) {
     if (!NAMESPACE_NAME.test(namespace)) {
       throw new TypeError(`Invalid tag namespace ${JSON.stringify(namespace)}`);
     }
-    const validObject =
+    const objectHandler =
       factory !== null &&
       typeof factory === "object" &&
-      !Array.isArray(factory) &&
-      typeof factory.create === "function" &&
-      (factory.finalize === undefined || typeof factory.finalize === "function");
-    if (typeof factory !== "function" && !validObject) {
+      !Array.isArray(factory);
+    if (
+      typeof factory !== "function" &&
+      (!objectHandler || typeof factory.create !== "function")
+    ) {
       throw new TypeError(
         `config.namespaceHandlers.${namespace} must be a function or an object with create() and optional finalize() functions`,
+      );
+    }
+    if (!objectHandler) {
+      namespaceHandlers[namespace] = factory;
+      continue;
+    }
+    if (factory.finalize !== undefined && typeof factory.finalize !== "function") {
+      throw new TypeError(`config.namespaceHandlers.${namespace}.finalize must be a function`);
+    }
+    if (
+      factory.tags !== undefined &&
+      (!Array.isArray(factory.tags) ||
+        factory.tags.some((tag) => typeof tag !== "string" || !TAG_NAME.test(tag)))
+    ) {
+      throw new TypeError(
+        `config.namespaceHandlers.${namespace}.tags must be an array of tag names`,
+      );
+    }
+    if (
+      factory.types !== undefined &&
+      (factory.types === null ||
+        typeof factory.types !== "object" ||
+        Array.isArray(factory.types) ||
+        !validTypeHint(factory.types.target) ||
+        !validTypeHint(factory.types.result))
+    ) {
+      throw new TypeError(
+        `config.namespaceHandlers.${namespace}.types must contain string or function target/result hints`,
       );
     }
     namespaceHandlers[namespace] = factory;

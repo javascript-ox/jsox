@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { spliceWithMap, origToGen, genToOrig } from "@js-ox/compiler/splice";
+import { spliceWithMap, origToGen, origCursorToGen, genToOrig } from "@js-ox/compiler/splice";
 import { normalizeConfig } from "@js-ox/compiler";
 import { PREAMBLE } from "./preamble.js";
 
@@ -14,10 +14,21 @@ function typeWitness(config, explicitNamespace, tag) {
     qualifiedName: `${namespace}:${tag}`,
   };
   const target = factory(tag, context);
-  if (typeof handler !== "object" || !handler.finalize) return target;
+  if (typeof handler !== "object") return target;
+  const typeExpression = (hint) => {
+    const value = typeof hint === "function" ? hint(tag, context) : hint;
+    if (typeof value !== "string" || !value.trim()) return null;
+    return `/** @type {${value}} */ (/** @type {unknown} */ (undefined))`;
+  };
+  const targetWitness = typeExpression(handler.types?.target) ?? target;
+  if (!handler.finalize) {
+    return typeExpression(handler.types?.result) ?? targetWitness;
+  }
+  const result = typeExpression(handler.types?.result) ??
+    handler.finalize(target, { tag, ...context });
   return {
-    target,
-    result: handler.finalize(target, { tag, ...context }),
+    target: targetWitness,
+    result,
   };
 }
 
@@ -43,8 +54,10 @@ function diskName(fileName) {
   return physical && ts.sys.fileExists(physical) ? physical : fileName;
 }
 
-function origOffsetToGen(entry, offset) {
-  return entry.preamble + origToGen(entry.maps, offset);
+function origOffsetToGen(entry, offset, cursor = false) {
+  return entry.preamble + (cursor
+    ? origCursorToGen(entry.maps, offset)
+    : origToGen(entry.maps, offset));
 }
 
 function genOffsetToOrig(entry, offset) {
@@ -155,6 +168,68 @@ export function createJsService(configInput = {}) {
   }
 
   function completions(fileName, genOffset) {
+    const name = tsName(fileName);
+    const entry = docs.get(name);
+    if (entry?.code.slice(genOffset - 5, genOffset) === "this.") {
+      const program = service.getProgram();
+      const sourceFile = program?.getSourceFile(name);
+      const checker = program?.getTypeChecker();
+      let thisNode;
+      let containingFunction;
+      function visit(node) {
+        if (
+          ts.isFunctionExpression(node) &&
+          node.getFullStart() < genOffset &&
+          node.end >= genOffset
+        ) {
+          containingFunction = node;
+        }
+        if (
+          node.kind === ts.SyntaxKind.ThisKeyword &&
+          node.end === genOffset - 1
+        ) {
+          thisNode = node;
+          return;
+        }
+        if (!thisNode && node.getFullStart() < genOffset && node.end >= genOffset - 1) {
+          ts.forEachChild(node, visit);
+        }
+      }
+      if (sourceFile && checker) visit(sourceFile);
+      if (thisNode && checker) {
+        const contextualSignature = containingFunction
+          ? checker.getContextualType(containingFunction)?.getCallSignatures()[0]
+          : undefined;
+        const signature = contextualSignature ?? (containingFunction
+          ? checker.getSignatureFromDeclaration(containingFunction)
+          : undefined);
+        const thisType = signature?.thisParameter
+          ? checker.getTypeOfSymbolAtLocation(signature.thisParameter, containingFunction)
+          : checker.getTypeAtLocation(thisNode);
+        const properties = checker.getPropertiesOfType(thisType);
+        if (properties.length) {
+          return {
+            isGlobalCompletion: false,
+            isMemberCompletion: true,
+            isNewIdentifierLocation: false,
+            entries: properties.map((symbol) => {
+              const declaration = symbol.valueDeclaration ?? symbol.declarations?.[0] ?? thisNode;
+              const callable = checker
+                .getTypeOfSymbolAtLocation(symbol, declaration)
+                .getCallSignatures().length > 0;
+              return {
+                name: symbol.getName(),
+                kind: callable
+                  ? ts.ScriptElementKind.memberFunctionElement
+                  : ts.ScriptElementKind.memberVariableElement,
+                kindModifiers: "",
+                sortText: "11",
+              };
+            }),
+          };
+        }
+      }
+    }
     return service.getCompletionsAtPosition(tsName(fileName), genOffset, {
       includeExternalModuleExports: true,
       includeCompletionsWithInsertText: true,

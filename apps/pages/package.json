@@ -18,13 +18,17 @@
     "@js-ox/hello": "*",
     "@js-ox/htmx": "*",
     "@js-ox/mobx": "*",
+    "@js-ox/material-ui": "*",
+    "@js-ox/primevue": "*",
     "@js-ox/pojo": "*",
     "@js-ox/react-example": "*",
     "@js-ox/rxjs": "*",
     "@js-ox/shadcn": "*",
+    "@js-ox/solid": "*",
     "@js-ox/sortable": "*",
     "@js-ox/stimulus": "*",
     "@js-ox/three": "*",
+    "@js-ox/svelte": "*",
     "@js-ox/tanstack-query": "*",
     "@js-ox/tanstack-table": "*",
     "@js-ox/todo": "*",
@@ -33,10 +37,12 @@
     "@js-ox/web-components-example": "*",
     "@js-ox/xstate": "*",
     "@js-ox/vue-example": "*",
+    "@js-ox/lit": "*",
     "@js-ox/zod": "*"
   },
   "devDependencies": {
     "@js-ox/compiler": "*",
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
     "vite": "^6.3.5"
   }
 }

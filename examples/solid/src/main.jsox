@@ -1,0 +1,3 @@
+import { SolidExample } from "./view.jsox";
+
+[document.body] { [SolidExample()] }
