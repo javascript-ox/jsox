@@ -4,16 +4,28 @@ import { splice, spliceWithMap, origToGen, genToOrig, EL, SCOPE } from "../src/s
 
 describe("splice: <tag>", () => {
   it("rewrites a bare tag", () => {
-    assert.equal(splice("<div>").trim(), `${EL}("div")`);
+    assert.equal(splice("<div>").trim(), `${EL}(null, "div")`);
   });
 
   it("rewrites a tag with a block", () => {
     const out = splice("<div> { }");
-    assert.match(out, new RegExp(`${EL}\\("div", function\\(\\)\\{`));
+    assert.match(out, new RegExp(`${EL}\\(null, "div", function\\(\\)\\{`));
   });
 
   it("allows hyphenated custom elements", () => {
-    assert.equal(splice("<my-widget>").trim(), `${EL}("my-widget")`);
+    assert.equal(splice("<my-widget>").trim(), `${EL}(null, "my-widget")`);
+  });
+
+  it("rewrites namespaced tags", () => {
+    assert.equal(
+      splice("<svg:linear-gradient>").trim(),
+      `${EL}("svg", "linear-gradient")`,
+    );
+  });
+
+  it("requires both namespace segments to touch the colon", () => {
+    assert.equal(splice("<svg: circle>"), "<svg: circle>");
+    assert.equal(splice("<svg :circle>"), "<svg :circle>");
   });
 
   it("leaves comparisons alone", () => {
@@ -38,8 +50,8 @@ describe("splice: <tag>", () => {
 
   it("nests tags", () => {
     const out = splice("<div> { <p> { } }");
-    assert.match(out, new RegExp(`${EL}\\("div"`));
-    assert.match(out, new RegExp(`${EL}\\("p"`));
+    assert.match(out, new RegExp(`${EL}\\(null, "div"`));
+    assert.match(out, new RegExp(`${EL}\\(null, "p"`));
   });
 });
 

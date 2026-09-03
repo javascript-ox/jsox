@@ -26,6 +26,26 @@ describe("js-service", () => {
     assert.match(text, /HTMLButtonElement/);
   });
 
+  it("types built-in svg namespace captures as SVG elements", () => {
+    const js = createJsService();
+    const file = "/tmp/icon.jsox";
+    const source = `export function icon() {
+  const shape = <svg:circle> {
+    .setAttribute("r", "10")
+  }
+  return shape;
+}
+`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("shape")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /SVGCircleElement/);
+  });
+
   it("completes this-shorthand as element properties", () => {
     const js = createJsService();
     const file = "/tmp/props.jsox";
@@ -91,6 +111,7 @@ describe("tag completions", () => {
   it("detects a tag prefix after <", () => {
     assert.equal(tagPrefix("<bu", 3), "bu");
     assert.equal(tagPrefix("<", 1), "");
+    assert.equal(tagPrefix("<svg:ci", 7), "ci");
     assert.equal(tagPrefix("const x = 1", 11), null);
   });
 
@@ -99,5 +120,14 @@ describe("tag completions", () => {
     const labels = items.map((i) => i.label);
     assert.ok(labels.includes("button"));
     assert.equal(labels.some((l) => l.startsWith("bu")), true);
+  });
+
+  it("suggests tag namespaces and SVG tags", () => {
+    const namespaces = tagCompletions("<sv", 3);
+    assert.equal(namespaces.some((item) => item.label === "svg:"), true);
+
+    const svg = tagCompletions("<svg:cir", 8);
+    assert.deepEqual(svg.map((item) => item.label), ["circle"]);
+    assert.equal(svg[0].detail, "SVG element");
   });
 });

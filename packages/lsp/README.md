@@ -19,6 +19,12 @@ Or `npx jsox-lsp` after the workspace is installed (`npm run lsp` from the repo 
 - Go to definition (including DOM lib types)
 - Signature help
 - Diagnostics from TypeScript `checkJs`
+- Scoped-tag completions and typing for the built-in `html` and `svg` namespaces
+
+Scoped tags use `<namespace:tag>`. For example, `<svg:circle>` is understood as
+an `SVGCircleElement`, while unqualified tags and `<html:button>` retain their
+HTML element types. Custom compiler namespaces are accepted as generic
+`Element` values.
 
 Syntax coloring stays with the editor (VS Code TextMate grammar). The server does intelligence.
 

@@ -2,13 +2,15 @@ import { EL, SCOPE } from "@js-ox/compiler/splice";
 
 /** Stubs so TypeScript can type <tag> blocks and [el] scopes as DOM. */
 export const PREAMBLE = `/**
+ * @template {string | null} N
  * @template {string} K
+ * @param {N} namespace
  * @param {K} tag
- * @param {function(this: K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement): void} [init]
- * @returns {K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement}
+ * @param {function(this: N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element): void} [init]
+ * @returns {N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element}
  */
-function ${EL}(tag, init) {
-  return /** @type {K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement} */ (/** @type {unknown} */ (undefined));
+function ${EL}(namespace, tag, init) {
+  return /** @type {N extends "svg" ? K extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[K] : SVGElement : N extends "html" | null ? K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement : Element} */ (/** @type {unknown} */ (undefined));
 }
 
 /**

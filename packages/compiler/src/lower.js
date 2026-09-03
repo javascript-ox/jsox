@@ -114,11 +114,14 @@ function unwrapParens(node) {
   return node;
 }
 
-function parseExpr(snippet) {
+function parseExpr(snippet, label = "config.create()") {
+  if (typeof snippet !== "string") {
+    throw new TypeError(`${label} must return a JavaScript expression string`);
+  }
   const r = parseSync("snippet.js", `(${snippet});`, { preserveParens: false });
   if (r.errors?.length) {
     const msg = r.errors.map((e) => e.message).join("; ");
-    throw new SyntaxError(`config.create() produced invalid JS: ${msg}`);
+    throw new SyntaxError(`${label} produced invalid JS: ${msg}`);
   }
   const stmt = r.program.body[0];
   return unwrapParens(stmt.expression);
@@ -234,14 +237,32 @@ function transformFn(fn, ctx) {
 }
 
 function lowerEl(node, ctx) {
-  const tagArg = node.arguments[0];
+  const namespaceArg = node.arguments[0];
+  const namespace =
+    namespaceArg?.type === "Literal" && namespaceArg.value !== null
+      ? String(namespaceArg.value)
+      : null;
+  const tagArg = node.arguments[1];
   const tag =
     tagArg && tagArg.type === "Literal" ? String(tagArg.value) : null;
   if (tag == null) {
     throw new SyntaxError(`${EL}() requires a string tag name`);
   }
-  const created = parseExpr(ctx.config.create(tag));
-  const fn = node.arguments[1];
+  const resolvedNamespace = namespace ?? ctx.config.defaultNamespace;
+  const handler = ctx.config.tagHandlers[resolvedNamespace];
+  if (typeof handler !== "function") {
+    throw new SyntaxError(`Unknown tag namespace ${JSON.stringify(resolvedNamespace)}`);
+  }
+  const label = `config.tagHandlers[${JSON.stringify(resolvedNamespace)}]()`;
+  const created = parseExpr(
+    handler(tag, {
+      namespace: resolvedNamespace,
+      explicitNamespace: namespace,
+      qualifiedName: `${resolvedNamespace}:${tag}`,
+    }),
+    label,
+  );
+  const fn = node.arguments[2];
   let expr;
   if (!fn) {
     expr = created;

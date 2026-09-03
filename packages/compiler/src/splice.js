@@ -116,24 +116,41 @@ function shiftMaps(maps, genDelta) {
   }));
 }
 
+function takeTagSegment(tokens, start) {
+  if (!isIdent(tokens[start])) return null;
+  let name = tokens[start].value;
+  let end = start + 1;
+  while (tokens[end]?.value === "-" && isIdent(tokens[end + 1])) {
+    name += "-" + tokens[end + 1].value;
+    end += 2;
+  }
+  return { name, end };
+}
+
 function tryTag(tokens, i, opts) {
   if (tokens[i]?.value !== "<") return null;
   // Keep tag delimiters contiguous so `< b >` remains a JS comparison.
-  let j = i + 1;
-  if (!isIdent(tokens[j])) return null;
-  let name = tokens[j].value;
-  j++;
-  while (tokens[j]?.value === "-" && isIdent(tokens[j + 1])) {
-    name += "-" + tokens[j + 1].value;
-    j += 2;
+  const first = takeTagSegment(tokens, i + 1);
+  if (!first) return null;
+  let namespace = null;
+  let name = first.name;
+  let j = first.end;
+  if (tokens[j]?.value === ":") {
+    const second = takeTagSegment(tokens, j + 1);
+    if (!second) return null;
+    namespace = name;
+    name = second.name;
+    j = second.end;
   }
   if (tokens[j]?.value !== ">") return null;
   j++;
+  const namespaceArg = namespace === null ? "null" : JSON.stringify(namespace);
+  const args = `${namespaceArg}, ${JSON.stringify(name)}`;
   const k = skipWs(tokens, j);
   if (tokens[k]?.value === "{") {
     const block = takeBalanced(tokens, k, "{", "}", opts?.recover);
     const body = spliceTokens(block.inner, true, opts);
-    const prefix = `${EL}(${JSON.stringify(name)}, function(){`;
+    const prefix = `${EL}(${args}, function(){`;
     const code = `${prefix}${body.code}})`;
     return {
       code,
@@ -143,7 +160,7 @@ function tryTag(tokens, i, opts) {
       maps: shiftMaps(body.maps, prefix.length),
     };
   }
-  const code = `${EL}(${JSON.stringify(name)})`;
+  const code = `${EL}(${args})`;
   return {
     code,
     end: j,

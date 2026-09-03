@@ -31,4 +31,25 @@ describe("non-dom", () => {
     assert.equal(obj.n, 1);
     assert.equal(obj[0], undefined);
   });
+
+  it("builds nested trees through a custom tag handler", () => {
+    const { code } = compile(
+      `globalThis.tree = <tree:branch> {
+        .label = "root"
+        <tree:leaf> { .label = "child" }
+      }`,
+      {
+        tagHandlers: {
+          tree: (tag) => `({ tag: ${JSON.stringify(tag)}, children: [], add(...items) { this.children.push(...items) } })`,
+        },
+      },
+    );
+    const scope = {};
+    new Function("globalThis", code)(scope);
+    assert.equal(scope.tree.tag, "branch");
+    assert.equal(scope.tree.label, "root");
+    assert.deepEqual(scope.tree.children.map(({ tag, label }) => ({ tag, label })), [
+      { tag: "leaf", label: "child" },
+    ]);
+  });
 });
