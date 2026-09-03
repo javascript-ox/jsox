@@ -23,6 +23,10 @@ class JsoxSyntaxHighlighter : SyntaxHighlighterBase() {
     }
 
   companion object {
+    val NAMESPACE = TextAttributesKey.createTextAttributesKey(
+      "JSOX_NAMESPACE",
+      DefaultLanguageHighlighterColors.CLASS_NAME,
+    )
     private val KEYS_KEYWORD = arrayOf(DefaultLanguageHighlighterColors.KEYWORD)
     private val KEYS_STRING = arrayOf(DefaultLanguageHighlighterColors.STRING)
     private val KEYS_COMMENT = arrayOf(DefaultLanguageHighlighterColors.LINE_COMMENT)

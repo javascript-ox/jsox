@@ -350,6 +350,13 @@ export function origToGen(maps, offset) {
       if (!best || m.origEnd - m.origStart < best.origEnd - best.origStart) best = m;
     }
   }
+  if (!best) {
+    for (const m of maps) {
+      if (offset === m.origEnd) {
+        if (!best || m.origEnd - m.origStart < best.origEnd - best.origStart) best = m;
+      }
+    }
+  }
   if (!best) return offset;
   const olen = best.origEnd - best.origStart;
   if (olen <= 0) return best.genStart;

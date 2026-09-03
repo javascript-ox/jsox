@@ -76,7 +76,7 @@ export function start() {
           full: { delta: false },
         },
       },
-      serverInfo: { name: "JSOX", version: "0.2.0" },
+      serverInfo: { name: "JSOX", version: "0.2.1" },
     };
   });
 
@@ -213,7 +213,7 @@ export function start() {
     if (!entry || entry.error) return null;
     const orig = doc.offsetAt(params.position);
     const gen = js.origOffsetToGen(entry, orig);
-    const defs = js.definition(fileName, gen);
+    const defs = js.tagDefinition(fileName, orig) ?? js.definition(fileName, gen);
     if (!defs?.length) return null;
     const virtual = js.tsName(fileName);
     return defs

@@ -74,6 +74,7 @@ private class JsoxSemanticTokensSupport : LspSemanticTokensSupport() {
     when (tokenType) {
       "function" -> JS_FUNCTION
       "method" -> JS_METHOD
+      "namespace" -> JsoxSyntaxHighlighter.NAMESPACE
       else -> super.getTextAttributesKey(tokenType, modifiers)
     }
 

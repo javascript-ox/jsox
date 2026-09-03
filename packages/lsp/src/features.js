@@ -103,7 +103,7 @@ export function createJsoxSession(config = {}) {
     definition(fileName, orig) {
       const at = mapped(fileName, orig);
       if (!at) return [];
-      const defs = js.definition(fileName, at.gen);
+      const defs = js.tagDefinition(fileName, orig) ?? js.definition(fileName, at.gen);
       if (!defs?.length) return [];
       const virtual = js.tsName(fileName);
       return defs
