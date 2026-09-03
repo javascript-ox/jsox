@@ -1,0 +1,137 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import { Effect, Fiber } from "effect";
+
+export function EffectExample() {
+  const status = <strong> {
+    .className = "effect-status"
+    ["Ready"]
+  }
+
+  const attempts = <ol> {
+    .className = "effect-log"
+  }
+
+  const run = <button> {
+    .type = "button"
+    .className = "btn btn-accent"
+    ["Run effect"]
+  }
+
+  const cancel = <button> {
+    .type = "button"
+    .className = "btn"
+    .disabled = true
+    ["Cancel"]
+  }
+
+  let activeFiber = null;
+
+  const writeAttempt = (message, state) => Effect.sync(() => {
+    attempts.append(<li> {
+      .className = `effect-log-${state}`
+      [message]
+    })
+  });
+
+  const setRunning = (running) => Effect.sync(() => {
+    run.disabled = running;
+    cancel.disabled = !running;
+  });
+
+  const program = Effect.suspend(() => {
+    let attempt = 0;
+    attempts.replaceChildren();
+    status.textContent = "Running";
+
+    const request = Effect.gen(function* () {
+      attempt += 1;
+      yield* writeAttempt(`Attempt ${attempt}: requesting data…`, "running");
+      yield* Effect.sleep("500 millis");
+      if (attempt < 3) {
+        return yield* Effect.fail(new Error("503 Service Unavailable"));
+      }
+      return { message: "Effect completed on the third attempt." };
+    });
+
+    return Effect.gen(function* () {
+      yield* setRunning(true);
+      const response = yield* request.pipe(
+        Effect.tapError((error) => writeAttempt(`Attempt ${attempt}: ${error.message}`, "error")),
+        Effect.retry({ times: 2 }),
+      );
+      yield* writeAttempt(response.message, "success");
+      yield* Effect.sync(() => {
+        status.textContent = "Succeeded";
+      });
+    }).pipe(
+      Effect.onInterrupt(() => Effect.sync(() => {
+        status.textContent = "Cancelled";
+        attempts.append(<li> {
+          .className = "effect-log-error"
+          ["The running fiber was interrupted."]
+        })
+      })),
+      Effect.ensuring(setRunning(false)),
+    );
+  });
+
+  const stop = () => {
+    if (!activeFiber) return;
+    Effect.runFork(Fiber.interrupt(activeFiber));
+    activeFiber = null;
+  };
+
+  const start = () => {
+    stop();
+    activeFiber = Effect.runFork(program);
+  };
+
+  run.addEventListener("click", start);
+  cancel.addEventListener("click", stop);
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Effect"] }
+    <h1> { ["Typed effects, concrete nodes."] }
+    <p> {
+      .className = "lede"
+      ["JSOX constructs the controls and log. Effect owns the retry policy, delay, failure channel, finalizer, and cancellation fiber."]
+    }
+    <section> {
+      .className = "panel effect-demo"
+      <div> {
+        .className = "effect-demo-head"
+        <div> {
+          <span> { .className = "hint"; ["Program status"] }
+          [status]
+        }
+        <div> {
+          .className = "row"
+          [run]
+          [cancel]
+        }
+      }
+      [attempts]
+      <p> {
+        .className = "hint"
+        ["The simulated request fails twice, succeeds on its final retry, and can be interrupted at any point."]
+      }
+    }
+  }
+
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      stop();
+      run.removeEventListener("click", start);
+      cancel.removeEventListener("click", stop);
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+
+  return withSource(root, source);
+}

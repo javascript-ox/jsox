@@ -1,0 +1,3 @@
+import { VueExample } from "./view.jsox";
+
+[document.body] { [VueExample()] }

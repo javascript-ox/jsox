@@ -41,4 +41,23 @@ describe("dom", () => {
     `);
     assert.equal(window.document.body.textContent, "hi");
   });
+
+  it("builds namespaced SVG trees", () => {
+    const window = evalInDom(`
+      const icon = <svg:svg> {
+        .setAttribute("viewBox", "0 0 24 24")
+        <svg:circle> {
+          .setAttribute("cx", "12")
+          .setAttribute("cy", "12")
+          .setAttribute("r", "10")
+        }
+      }
+      document.body.append(icon)
+    `);
+    const icon = window.document.querySelector("svg");
+    const circle = icon.querySelector("circle");
+    assert.equal(icon.namespaceURI, "http://www.w3.org/2000/svg");
+    assert.equal(circle.namespaceURI, "http://www.w3.org/2000/svg");
+    assert.equal(circle.getAttribute("r"), "10");
+  });
 });

@@ -1,0 +1,10 @@
+{
+  "name": "@js-ox/stimulus",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./src/view.jsox" },
+  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+  "dependencies": { "@hotwired/stimulus": "^3.2.2", "@js-ox/ui": "*" },
+  "devDependencies": { "@js-ox/compiler": "*", "vite": "^6.3.5" }
+}

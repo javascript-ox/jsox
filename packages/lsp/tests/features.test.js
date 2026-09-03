@@ -96,6 +96,19 @@ describe("jsox session", () => {
     assert.ok(classified.some((token) => token.text === "dateTime" && token.type === 9));
   });
 
+  it("classifies a scoped-tag namespace separately", () => {
+    const session = createJsoxSession();
+    const file = "/tmp/features-namespace.jsox";
+    const source = `const icon = <svg:circle> { .className = "dot" }`;
+    session.upsert(file, source);
+    const tokens = session.semanticTokens(file);
+    assert.ok(
+      tokens.some(
+        (token) => source.slice(token.start, token.end) === "svg" && token.type === 3,
+      ),
+    );
+  });
+
   it("accepts and completes web components registered with defineComponent", () => {
     const session = createJsoxSession();
     const file = fileURLToPath(new URL("web-component.jsox", import.meta.url));

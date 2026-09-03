@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./theme.css": "./theme.css"
+    "./theme.css": "./theme.css",
+    "./source": "./source.jsox"
   }
 }

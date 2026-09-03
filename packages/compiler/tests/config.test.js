@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defaultConfig, loadConfig } from "../src/config.js";
+import { defaultConfig, loadConfig, normalizeConfig } from "../src/config.js";
 
 async function tempConfigDir(t) {
   const dir = await mkdtemp(join(tmpdir(), "jsox-config-"));
@@ -18,6 +18,9 @@ describe("loadConfig", () => {
     assert.deepEqual(config.childMethods, defaultConfig.childMethods);
     assert.equal(config.childHelperName, defaultConfig.childHelperName);
     assert.equal(config.strict, defaultConfig.strict);
+    assert.equal(config.defaultNamespace, "html");
+    assert.equal(typeof config.namespaceHandlers.html, "function");
+    assert.equal(typeof config.namespaceHandlers.svg, "function");
   });
 
   it("propagates a missing dependency from an existing config", async (t) => {
@@ -32,5 +35,31 @@ describe("loadConfig", () => {
       assert.match(err.message, /jsox-package-that-does-not-exist/);
       return true;
     });
+  });
+
+  it("validates namespace factory configuration", () => {
+    assert.throws(
+      () => normalizeConfig({ namespaceHandlers: { "not:valid": () => "x" } }),
+      /Invalid tag namespace/,
+    );
+    assert.throws(
+      () => normalizeConfig({ namespaceHandlers: { view: "makeView" } }),
+      /config\.namespaceHandlers\.view must be a function or an object/,
+    );
+    assert.throws(
+      () => normalizeConfig({ namespaceHandlers: { view: {} } }),
+      /object with create\(\)/,
+    );
+    assert.throws(
+      () =>
+        normalizeConfig({
+          namespaceHandlers: { view: { create: () => "makeView()", finalize: true } },
+        }),
+      /optional finalize\(\)/,
+    );
+    assert.throws(
+      () => normalizeConfig({ defaultNamespace: "view" }),
+      /unknown tag namespace "view"/,
+    );
   });
 });

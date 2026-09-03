@@ -20,7 +20,7 @@ const jsxSrc = `const el = (
   </button>
 );`;
 
-const examples = [
+const basicExamples = [
   {
     href: "#/hello",
     kicker: "01",
@@ -45,17 +45,144 @@ const examples = [
     title: "POJO",
     blurb: "The same syntax builds plain objects. If the target implements add(), JSOX uses it.",
   },
+];
+
+const libraryIntegrations = [
   {
     href: "#/rxjs",
-    kicker: "05",
+    mark: "Rx",
+    markClass: "integration-mark-rxjs",
     title: "RxJS",
     blurb: "JSOX constructs the DOM. Streams own the updates — no render cycle in between.",
   },
   {
+    href: "#/effect",
+    mark: "Fx",
+    markClass: "integration-mark-effect",
+    title: "Effect",
+    blurb: "Effects own retries, typed failures, cancellation, and cleanup while JSOX owns the concrete view.",
+  },
+  {
+    href: "#/xstate",
+    mark: "X",
+    markClass: "integration-mark-xstate",
+    title: "XState",
+    blurb: "A state-machine actor owns valid transitions while JSOX owns the concrete controls and indicators.",
+  },
+  {
+    href: "#/zod",
+    mark: "Z",
+    markClass: "integration-mark-zod",
+    title: "Zod",
+    blurb: "Native form values cross a schema boundary and return typed data or precise validation issues.",
+  },
+  {
+    href: "#/mobx",
+    mark: "M",
+    markClass: "integration-mark-mobx",
+    title: "MobX",
+    blurb: "Observable object state drives direct updates to the concrete nodes JSOX constructed.",
+  },
+  {
+    href: "#/tanstack",
+    mark: "TQ",
+    markClass: "integration-mark-tanstack",
+    title: "TanStack Query",
+    blurb: "Framework-agnostic query core owns caching and freshness around a JSOX-built result view.",
+  },
+];
+
+const frontendIntegrations = [
+  {
+    href: "#/react",
+    mark: "⚛",
+    markClass: "integration-mark-react",
+    title: "React",
+    blurb: "A namespace finalizer turns nested mutable JSOX builders into immutable React elements with hooks and reconciliation intact.",
+  },
+  {
+    href: "#/vue",
+    mark: "V",
+    markClass: "integration-mark-vue",
+    title: "Vue",
+    blurb: "Nested selectors finalize into Vue VNodes while refs, dependency tracking, and rendering remain native Vue.",
+  },
+  {
+    href: "#/alpine",
+    mark: "A",
+    markClass: "integration-mark-alpine",
+    title: "Alpine.js",
+    blurb: "JSOX constructs a directive-rich subtree; Alpine adds local state and declarative behavior.",
+  },
+  {
     href: "#/web-components",
-    kicker: "06",
+    mark: "<>",
+    markClass: "integration-mark-web",
     title: "Web Components",
     blurb: "Configure a native custom-element definition, then let browser lifecycle callbacks own the instance.",
+  },
+  {
+    href: "#/gsap",
+    mark: "G",
+    markClass: "integration-mark-gsap",
+    title: "GSAP",
+    blurb: "Captured DOM references go straight into a timeline—no renderer adapter or element lookup required.",
+  },
+  {
+    href: "#/d3",
+    mark: "D3",
+    markClass: "integration-mark-d3",
+    title: "D3",
+    blurb: "JSOX constructs SVG nodes while D3 scales translate data into visual dimensions.",
+  },
+  {
+    href: "#/htmx",
+    mark: "hx",
+    markClass: "integration-mark-htmx",
+    title: "HTMX",
+    blurb: "JSOX configures hypermedia attributes; HTMX requests HTML and owns the resulting swap.",
+  },
+  {
+    href: "#/stimulus",
+    mark: "S",
+    markClass: "integration-mark-stimulus",
+    title: "Stimulus",
+    blurb: "Controller scopes, targets, and actions attach focused behavior to JSOX-built markup.",
+  },
+  {
+    href: "#/three",
+    mark: "3D",
+    markClass: "integration-mark-three",
+    title: "Three.js",
+    blurb: "JSOX constructs an actual scene graph of meshes and lights, then Three.js renders it.",
+  },
+  {
+    href: "#/chartjs",
+    mark: "C",
+    markClass: "integration-mark-chartjs",
+    title: "Chart.js",
+    blurb: "JSOX builds both the canvas and deeply nested configuration graph that Chart.js renders.",
+  },
+  {
+    href: "#/sortable",
+    mark: "↕",
+    markClass: "integration-mark-sortable",
+    title: "SortableJS",
+    blurb: "A JSOX-built list gains drag-and-drop ordering without surrendering ownership of its nodes.",
+  },
+  {
+    href: "#/tanstack-table",
+    mark: "TT",
+    markClass: "integration-mark-tanstack-table",
+    title: "TanStack Table",
+    blurb: "TanStack's headless UI model supplies sorting and rows while JSOX owns all table markup.",
+  },
+  {
+    href: "#/shadcn",
+    mark: "S",
+    markClass: "integration-mark-shadcn",
+    title: "shadcn/ui",
+    blurb: "Source-owned Card and Button primitives are expressed directly in JSOX instead of React.",
   },
 ];
 
@@ -219,14 +346,14 @@ export function Home() {
     <section> {
       .className = "home-wrap"
       <p> { .className = "kicker"; ["Examples"] }
-      <h2> { .className = "section-title"; ["Six small apps, one dialect."] }
+      <h2> { .className = "section-title"; ["Start with the language."] }
       <p> {
         .className = "section-lede"
-        ["Each example is a real page. DOM widgets, a plain-object album, streams that update nodes JSOX already constructed."]
+        ["The basics isolate one idea at a time: construction, captured references, live lists, and non-DOM objects."]
       }
       <ul> {
         .className = "grid pitch-grid"
-        for (const ex of examples) {
+        for (const ex of basicExamples) {
           <li> {
             <a> {
               .className = "card pitch-card"
@@ -234,6 +361,66 @@ export function Home() {
               <p> { .className = "kicker"; [ex.kicker] }
               <h2> { [ex.title] }
               <p> { [ex.blurb] }
+            }
+          }
+        }
+      }
+
+      <div> {
+        .className = "examples-group"
+        <p> { .className = "kicker"; ["Library integrations"] }
+        <h2> { .className = "section-title"; ["Bring your application tools."] }
+        <p> {
+          .className = "section-lede"
+          ["JSOX handles construction while focused libraries keep owning streams, effects, state machines, and validation."]
+        }
+        <ul> {
+          .className = "grid integration-grid"
+          for (const integration of libraryIntegrations) {
+            <li> {
+              <a> {
+                .className = "card integration-card"
+                .href = integration.href
+                <span> {
+                  .className = `integration-mark ${integration.markClass}`
+                  .setAttribute("aria-hidden", "true")
+                  [integration.mark]
+                }
+                <div> {
+                  <h2> { [integration.title] }
+                  <p> { [integration.blurb] }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      <div> {
+        .className = "examples-group"
+        <p> { .className = "kicker"; ["Frontend integrations"] }
+        <h2> { .className = "section-title"; ["Use the browser-facing tools you prefer."] }
+        <p> {
+          .className = "section-lede"
+          ["Native components and frontend libraries can own interaction, animation, visualization, and rendering around the objects JSOX constructs."]
+        }
+        <ul> {
+          .className = "grid integration-grid"
+          for (const integration of frontendIntegrations) {
+            <li> {
+              <a> {
+                .className = "card integration-card"
+                .href = integration.href
+                <span> {
+                  .className = `integration-mark ${integration.markClass}`
+                  .setAttribute("aria-hidden", "true")
+                  [integration.mark]
+                }
+                <div> {
+                  <h2> { [integration.title] }
+                  <p> { [integration.blurb] }
+                }
+              }
             }
           }
         }

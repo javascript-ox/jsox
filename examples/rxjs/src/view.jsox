@@ -1,4 +1,6 @@
 import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
 import { fromEvent, interval, merge } from "rxjs";
 import { map, scan, startWith } from "rxjs";
 
@@ -86,5 +88,5 @@ export function Rxjs() {
     }).observe(parent, { childList: true });
   });
 
-  return root;
+  return withSource(root, source);
 }

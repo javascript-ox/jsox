@@ -1,0 +1,95 @@
+import "@js-ox/ui/theme.css";
+import * as THREE from "three";
+
+const sceneSource = `const scene = new THREE.Scene()
+const cube = new THREE.Mesh()
+const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 100)
+const hemisphere = new THREE.HemisphereLight()
+const keyLight = new THREE.DirectionalLight(0xffffff, 3)
+
+[scene] {
+  .background = new THREE.Color(0x1b1814)
+  [cube] {
+    .geometry = new THREE.BoxGeometry(1.4, 1.4, 1.4)
+    .material = new THREE.MeshStandardMaterial({
+      color: 0xe8793a,
+      roughness: 0.38,
+    })
+    .rotation.set(0.35, 0.55, 0)
+  }
+  [camera] { .position.set(0, 0, 4.5) }
+  [hemisphere] {
+    .color.setHex(0xfff4dc)
+    .groundColor.setHex(0x33251e)
+    .intensity = 2.2
+  }
+  [keyLight] { .position.set(3, 4, 5) }
+}`;
+
+export function ThreeExample() {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 100);
+  const cube = new THREE.Mesh();
+  const hemisphere = new THREE.HemisphereLight();
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3);
+  [scene] {
+    .background = new THREE.Color(0x1b1814)
+    [cube] {
+      .geometry = new THREE.BoxGeometry(1.4, 1.4, 1.4)
+      .material = new THREE.MeshStandardMaterial({ color: 0xe8793a, roughness: 0.38 })
+      .rotation.set(0.35, 0.55, 0)
+    }
+    [camera] { .position.set(0, 0, 4.5) }
+    [hemisphere] {
+      .color.setHex(0xfff4dc)
+      .groundColor.setHex(0x33251e)
+      .intensity = 2.2
+    }
+    [keyLight] { .position.set(3, 4, 5) }
+  }
+
+  const rendererOptions = {};
+  [rendererOptions] { .antialias = true }
+  const renderer = new THREE.WebGLRenderer(rendererOptions);
+  [renderer] {
+    .setPixelRatio(Math.min(devicePixelRatio, 2))
+    .setSize(640, 360, false)
+    .domElement.className = "three-canvas"
+  }
+
+  let frame = 0;
+  const animate = () => {
+    cube.rotation.x += 0.006;
+    cube.rotation.y += 0.01;
+    renderer.render(scene, camera);
+    frame = requestAnimationFrame(animate);
+  };
+  animate();
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Three.js"] }
+    <h1> { ["A scene graph is an object graph."] }
+    <p> { .className = "lede"; ["JSOX constructs the actual Three.js Scene, Mesh, and lights. The same source that builds the live object graph is shown below."] }
+    <section> { .className = "panel three-stage"; [renderer.domElement] }
+    <figure> {
+      .className = "code-pane three-source"
+      <figcaption> { ["Scene construction in JSOX"] }
+      <pre> { .className = "code"; [sceneSource] }
+    }
+  }
+
+  queueMicrotask(() => {
+    const parent = root.parentNode;
+    if (!parent) return;
+    new MutationObserver((_, observer) => {
+      if (root.isConnected) return;
+      cancelAnimationFrame(frame);
+      cube.geometry.dispose();
+      cube.material.dispose();
+      renderer.dispose();
+      observer.disconnect();
+    }).observe(parent, { childList: true });
+  });
+  return root;
+}

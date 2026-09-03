@@ -9,14 +9,31 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@js-ox/alpine": "*",
+    "@js-ox/chartjs": "*",
     "@js-ox/counter": "*",
+    "@js-ox/d3": "*",
+    "@js-ox/effect": "*",
+    "@js-ox/gsap": "*",
     "@js-ox/hello": "*",
+    "@js-ox/htmx": "*",
+    "@js-ox/mobx": "*",
     "@js-ox/pojo": "*",
+    "@js-ox/react-example": "*",
     "@js-ox/rxjs": "*",
+    "@js-ox/shadcn": "*",
+    "@js-ox/sortable": "*",
+    "@js-ox/stimulus": "*",
+    "@js-ox/three": "*",
+    "@js-ox/tanstack-query": "*",
+    "@js-ox/tanstack-table": "*",
     "@js-ox/todo": "*",
     "@js-ox/ui": "*",
     "@js-ox/web-components": "*",
-    "@js-ox/web-components-example": "*"
+    "@js-ox/web-components-example": "*",
+    "@js-ox/xstate": "*",
+    "@js-ox/vue-example": "*",
+    "@js-ox/zod": "*"
   },
   "devDependencies": {
     "@js-ox/compiler": "*",

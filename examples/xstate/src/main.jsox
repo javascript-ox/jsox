@@ -1,0 +1,3 @@
+import { XStateExample } from "./view.jsox";
+
+[document.body] { [XStateExample()] }

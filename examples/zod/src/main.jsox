@@ -1,0 +1,3 @@
+import { ZodExample } from "./view.jsox";
+
+[document.body] { [ZodExample()] }

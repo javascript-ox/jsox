@@ -1,0 +1,3 @@
+import { ChartJsExample } from "./view.jsox";
+
+[document.body] { [ChartJsExample()] }

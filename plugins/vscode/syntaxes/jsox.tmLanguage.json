@@ -17,12 +17,14 @@
     },
     "tag-block": {
       "name": "meta.block.tag.jsox",
-      "begin": "(?<![\\w$.])(<)([A-Za-z][\\w-]*)(>)\\s*(\\{)",
+      "begin": "(?<![\\w$.])(<)(?:([A-Za-z][\\w-]*)(:))?([A-Za-z][\\w-]*)(>)\\s*(\\{)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.begin.jsox" },
-        "2": { "name": "entity.name.tag.jsox" },
-        "3": { "name": "punctuation.definition.tag.end.jsox" },
-        "4": { "name": "punctuation.section.block.begin.jsox" }
+        "2": { "name": "entity.name.namespace.jsox" },
+        "3": { "name": "punctuation.separator.namespace.jsox" },
+        "4": { "name": "entity.name.tag.jsox" },
+        "5": { "name": "punctuation.definition.tag.end.jsox" },
+        "6": { "name": "punctuation.section.block.begin.jsox" }
       },
       "end": "\\}",
       "endCaptures": {
@@ -31,11 +33,13 @@
       "patterns": [{ "include": "#block-body" }]
     },
     "tag-bare": {
-      "match": "(?<![\\w$.])(<)([A-Za-z][\\w-]*)(>)",
+      "match": "(?<![\\w$.])(<)(?:([A-Za-z][\\w-]*)(:))?([A-Za-z][\\w-]*)(>)",
       "captures": {
         "1": { "name": "punctuation.definition.tag.begin.jsox" },
-        "2": { "name": "entity.name.tag.jsox" },
-        "3": { "name": "punctuation.definition.tag.end.jsox" }
+        "2": { "name": "entity.name.namespace.jsox" },
+        "3": { "name": "punctuation.separator.namespace.jsox" },
+        "4": { "name": "entity.name.tag.jsox" },
+        "5": { "name": "punctuation.definition.tag.end.jsox" }
       }
     },
     "scope-block": {

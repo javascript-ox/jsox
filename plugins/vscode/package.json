@@ -2,7 +2,7 @@
   "name": "jsox-vscode",
   "displayName": "JSOX",
   "description": "JSOX language support — highlighting, hover, complete, go to definition",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "publisher": "jsox",
   "private": true,
   "engines": {

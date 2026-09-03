@@ -1,0 +1,45 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import Sortable from "sortablejs";
+
+export function SortableExample() {
+  const steps = ["Create objects", "Configure in scope", "Compose children", "Ship JavaScript"];
+  const order = <p> { .className = "sortable-order hint" }
+  const list = <ol> {
+    .className = "sortable-list"
+    for (const [index, step] of steps.entries()) {
+      <li> {
+        .className = "sortable-item"
+        .dataset.step = step
+        <span> { .className = "drag-handle"; .setAttribute("aria-hidden", "true"); ["⠿"] }
+        <span> { .className = "sortable-number"; [String(index + 1)] }
+        <span> { [step] }
+      }
+    }
+  }
+  const reportOrder = () => {
+    const values = [...list.children].map((item, index) => {
+      item.querySelector(".sortable-number").textContent = String(index + 1);
+      return item.dataset.step;
+    });
+    order.textContent = values.join(" → ");
+  };
+  const sortable = Sortable.create(list, {
+    animation: 160,
+    handle: ".drag-handle",
+    ghostClass: "is-dragging",
+    onEnd: reportOrder,
+  });
+  reportOrder();
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["SortableJS"] }
+    <h1> { ["Enhance the list already constructed."] }
+    <p> { .className = "lede"; ["JSOX creates every list item and captures the list itself. SortableJS adds drag-and-drop behavior directly to that concrete element."] }
+    <section> { .className = "panel sortable-demo"; [list]; [order] }
+  }
+  root.addEventListener("jsox:dispose", () => sortable.destroy(), { once: true });
+  return withSource(root, source);
+}

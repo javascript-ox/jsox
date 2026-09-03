@@ -1,0 +1,44 @@
+import { cva } from "class-variance-authority";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export const cn = (...values) => twMerge(clsx(values));
+
+const buttonVariants = cva("shadcn-button", {
+  variants: {
+    variant: {
+      default: "shadcn-button-default",
+      outline: "shadcn-button-outline",
+    },
+    size: {
+      default: "shadcn-button-md",
+      sm: "shadcn-button-sm",
+    },
+  },
+  defaultVariants: { variant: "default", size: "default" },
+});
+
+export function Button(label, options = {}) {
+  return <button> {
+    .type = "button"
+    .className = cn(buttonVariants(options), options.className)
+    .onclick = options.onclick ?? null
+    [label]
+  }
+}
+
+export function Card({ title, description, content, actions = [] }) {
+  return <article> {
+    .className = "shadcn-card"
+    <header> {
+      .className = "shadcn-card-header"
+      <h2> { .className = "shadcn-card-title"; [title] }
+      <p> { .className = "shadcn-card-description"; [description] }
+    }
+    <div> { .className = "shadcn-card-content"; [content] }
+    <footer> {
+      .className = "shadcn-card-footer"
+      for (const action of actions) [action]
+    }
+  }
+}

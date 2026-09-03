@@ -1,0 +1,3 @@
+import { ThreeExample } from "./view.jsox";
+
+[document.body] { [ThreeExample()] }

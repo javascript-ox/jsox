@@ -1,0 +1,49 @@
+import "@js-ox/ui/theme.css";
+import { withSource } from "@js-ox/ui/source";
+import source from "./view.jsox?raw";
+import Chart from "chart.js/auto";
+
+export function ChartJsExample() {
+  const canvas = <canvas> { .setAttribute("aria-label", "JSOX feature scores"); .setAttribute("role", "img") }
+  const config = {};
+  [config] {
+    .type = "radar"
+    .data = {}
+    [this.data] {
+      .labels = ["Create", "Configure", "Compose", "Interop", "Plain JS"]
+      .datasets = []
+      [this.datasets] {
+        [{
+          label: "JSOX",
+          data: [92, 96, 94, 88, 100],
+          borderColor: "#e8793a",
+          backgroundColor: "rgba(232, 121, 58, 0.22)",
+          pointBackgroundColor: "#e8793a",
+        }]
+      }
+    }
+    .options = {}
+    [this.options] {
+      .responsive = true
+      .maintainAspectRatio = false
+      .scales = { r: { beginAtZero: true, max: 100 } }
+      .plugins = { legend: { display: false } }
+    }
+  }
+  const chart = new Chart(canvas, config);
+  const randomize = <button> { .type = "button"; .className = "btn btn-accent"; ["New scores"] }
+  randomize.onclick = () => {
+    chart.data.datasets[0].data = chart.data.datasets[0].data.map(() => 55 + Math.floor(Math.random() * 46));
+    chart.update();
+  };
+
+  const root = <main> {
+    .className = "wrap"
+    <p> { .className = "kicker"; ["Chart.js"] }
+    <h1> { ["A chart is a canvas plus an object graph."] }
+    <p> { .className = "lede"; ["JSOX constructs the canvas and walks the nested Chart.js configuration object. Chart.js owns drawing and updates."] }
+    <section> { .className = "panel chartjs-demo"; <div> { .className = "chartjs-stage"; [canvas] }; [randomize] }
+  }
+  root.addEventListener("jsox:dispose", () => chart.destroy(), { once: true });
+  return withSource(root, source);
+}

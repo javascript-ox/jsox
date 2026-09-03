@@ -1,26 +1,5 @@
 import "@js-ox/ui/theme.css";
-import { Hello } from "@js-ox/hello";
-import { Counter } from "@js-ox/counter";
-import { Todo } from "@js-ox/todo";
-import { Pojo } from "@js-ox/pojo";
-import { Rxjs } from "@js-ox/rxjs";
-import { WebComponents } from "@js-ox/web-components-example";
-import { definePage } from "./components/define-page.js";
-import { QuickStart, Tutorial } from "./pages/docs.jsox";
-import { Home } from "./pages/home.jsox";
-import { NotFound } from "./pages/not-found.jsox";
 import "./site.jsox";
-
-definePage("jsox-home-page", Home);
-definePage("jsox-start-page", QuickStart);
-definePage("jsox-tutorial-page", Tutorial);
-definePage("jsox-hello-page", Hello);
-definePage("jsox-counter-page", Counter);
-definePage("jsox-todo-page", Todo);
-definePage("jsox-pojo-page", Pojo);
-definePage("jsox-rxjs-page", Rxjs);
-definePage("jsox-web-components-page", WebComponents);
-definePage("jsox-missing-page", NotFound);
 
 [document.body] {
   <jsox-site>

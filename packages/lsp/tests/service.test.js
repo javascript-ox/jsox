@@ -26,6 +26,103 @@ describe("js-service", () => {
     assert.match(text, /HTMLButtonElement/);
   });
 
+  it("types built-in svg namespace captures as SVG elements", () => {
+    const js = createJsService();
+    const file = "/tmp/icon.jsox";
+    const source = `export function icon() {
+  const shape = <svg:circle> {
+    .setAttribute("r", "10")
+  }
+  return shape;
+}
+`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("shape")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /SVGCircleElement/);
+  });
+
+  it("keeps unqualified tags typed as HTML when custom namespaces are added", () => {
+    const js = createJsService({
+      namespaceHandlers: {
+        react: (tag) => `new ${tag}()`,
+      },
+    });
+    const file = "/tmp/custom-with-html.jsox";
+    const source = `const el = <button> { .type = "button" };`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("el")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /HTMLButtonElement/);
+  });
+
+  it("infers custom default-namespace targets through TypeScript", () => {
+    const js = createJsService({
+      defaultNamespace: "react",
+      namespaceHandlers: {
+        react: (tag) => `new ${tag}()`,
+      },
+    });
+    const file = "/tmp/react-element.jsox";
+    const source = `class MyReactElement {
+  activate() {}
+}
+const element = <MyReactElement> {
+  .activate()
+};`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("element =")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /MyReactElement/);
+  });
+
+  it("types the block as the creation target and the selector as the finalized result", () => {
+    const js = createJsService({
+      defaultNamespace: "react",
+      namespaceHandlers: {
+        react: {
+          create: (tag) => `new ElementBuilder(${tag})`,
+          finalize: (target) => `finish(${target})`,
+        },
+      },
+    });
+    const file = "/tmp/finalized-react-element.jsox";
+    const source = `class MyButton {}
+class ElementBuilder {
+  constructor(type) { this.type = type; }
+  variant = "";
+}
+class ReactElement {
+  mount() {}
+}
+/** @param {ElementBuilder} builder @returns {ReactElement} */
+function finish(builder) { return new ReactElement(); }
+const element = <MyButton> {
+  .variant = "primary"
+};
+element.mount();`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("element =")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /ReactElement/);
+  });
+
   it("completes this-shorthand as element properties", () => {
     const js = createJsService();
     const file = "/tmp/props.jsox";
@@ -91,6 +188,7 @@ describe("tag completions", () => {
   it("detects a tag prefix after <", () => {
     assert.equal(tagPrefix("<bu", 3), "bu");
     assert.equal(tagPrefix("<", 1), "");
+    assert.equal(tagPrefix("<svg:ci", 7), "ci");
     assert.equal(tagPrefix("const x = 1", 11), null);
   });
 
@@ -99,5 +197,21 @@ describe("tag completions", () => {
     const labels = items.map((i) => i.label);
     assert.ok(labels.includes("button"));
     assert.equal(labels.some((l) => l.startsWith("bu")), true);
+  });
+
+  it("suggests tag namespaces and SVG tags", () => {
+    const namespaces = tagCompletions("<sv", 3);
+    assert.equal(namespaces.some((item) => item.label === "svg:"), true);
+
+    const svg = tagCompletions("<svg:cir", 8);
+    assert.deepEqual(svg.map((item) => item.label), ["circle"]);
+    assert.equal(svg[0].detail, "SVG element");
+  });
+
+  it("suggests configured namespace names", () => {
+    const items = tagCompletions("<re", 3, {
+      namespaces: ["html", "svg", "react"],
+    });
+    assert.deepEqual(items.map((item) => item.label), ["react:"]);
   });
 });
