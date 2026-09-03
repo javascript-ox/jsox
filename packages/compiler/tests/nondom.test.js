@@ -52,4 +52,28 @@ describe("non-dom", () => {
       { tag: "leaf", label: "child" },
     ]);
   });
+
+  it("finalizes nested namespace targets before returning or inserting them", () => {
+    const { code } = compile(
+      `globalThis.tree = <tree:branch> {
+        .label = "root"
+        <tree:leaf> { .label = "child" }
+      }`,
+      {
+        namespaceHandlers: {
+          tree: {
+            create: (tag) =>
+              `({ tag: ${JSON.stringify(tag)}, children: [], add(...items) { this.children.push(...items) } })`,
+            finalize: (target) => `finish(${target})`,
+          },
+        },
+      },
+    );
+    const scope = {};
+    const finish = (target) => ({ ...target, finalized: true });
+    new Function("globalThis", "finish", code)(scope, finish);
+    assert.equal(scope.tree.finalized, true);
+    assert.equal(scope.tree.children[0].finalized, true);
+    assert.equal(scope.tree.children[0].label, "child");
+  });
 });

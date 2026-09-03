@@ -249,25 +249,37 @@ function lowerEl(node, ctx) {
     throw new SyntaxError(`${EL}() requires a string tag name`);
   }
   const resolvedNamespace = namespace ?? ctx.config.defaultNamespace;
-  const factory = ctx.config.namespaceHandlers[resolvedNamespace];
-  if (typeof factory !== "function") {
+  const handler = ctx.config.namespaceHandlers[resolvedNamespace];
+  if (!handler) {
     throw new SyntaxError(`Unknown tag namespace ${JSON.stringify(resolvedNamespace)}`);
   }
-  const label = `config.namespaceHandlers[${JSON.stringify(resolvedNamespace)}]()`;
+  const factory = typeof handler === "function" ? handler : handler.create;
+  const finalize = typeof handler === "object" ? handler.finalize : null;
+  const context = {
+    namespace: resolvedNamespace,
+    explicitNamespace: namespace,
+    qualifiedName: `${resolvedNamespace}:${tag}`,
+  };
+  const label =
+    typeof handler === "function"
+      ? `config.namespaceHandlers[${JSON.stringify(resolvedNamespace)}]()`
+      : `config.namespaceHandlers[${JSON.stringify(resolvedNamespace)}].create()`;
   const created = parseExpr(
-    factory(tag, {
-      namespace: resolvedNamespace,
-      explicitNamespace: namespace,
-      qualifiedName: `${resolvedNamespace}:${tag}`,
-    }),
+    factory(tag, context),
     label,
   );
-  const fn = node.arguments[3];
+  const fn = node.arguments[4];
   let expr;
   if (!fn) {
     expr = created;
   } else {
     expr = callOn(transformFn(fn, ctx), created);
+  }
+  if (finalize) {
+    expr = parseExpr(
+      finalize(generate(expr), { tag, ...context }),
+      `config.namespaceHandlers[${JSON.stringify(resolvedNamespace)}].finalize()`,
+    );
   }
   if (ctx.inConstruct && ctx.statement) {
     return childCall([expr], ctx.config, ctx.state);

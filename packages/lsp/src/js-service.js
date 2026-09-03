@@ -5,13 +5,20 @@ import { PREAMBLE } from "./preamble.js";
 
 function typeWitness(config, explicitNamespace, tag) {
   const namespace = explicitNamespace ?? config.defaultNamespace;
-  const factory = config.namespaceHandlers[namespace];
-  if (typeof factory !== "function") return null;
-  return factory(tag, {
+  const handler = config.namespaceHandlers[namespace];
+  if (!handler) return null;
+  const factory = typeof handler === "function" ? handler : handler.create;
+  const context = {
     namespace,
     explicitNamespace,
     qualifiedName: `${namespace}:${tag}`,
-  });
+  };
+  const target = factory(tag, context);
+  if (typeof handler !== "object" || !handler.finalize) return target;
+  return {
+    target,
+    result: handler.finalize(target, { tag, ...context }),
+  };
 }
 
 function toVirtual(source, config) {
@@ -220,6 +227,14 @@ export function createJsService(configInput = {}) {
       const name = match[1];
       const start = match.index + match[0].lastIndexOf(name);
       const info = service.getQuickInfoAtPosition(tsName(fileName), origOffsetToGen(entry, start));
+      for (let i = tokens.length - 1; i >= 0; i--) {
+        if (
+          tokens[i].start < start + name.length &&
+          tokens[i].end > start
+        ) {
+          tokens.splice(i, 1);
+        }
+      }
       tokens.push({
         start,
         end: start + name.length,

@@ -4,22 +4,22 @@ import { splice, spliceWithMap, origToGen, genToOrig, EL, SCOPE } from "../src/s
 
 describe("splice: <tag>", () => {
   it("rewrites a bare tag", () => {
-    assert.equal(splice("<div>").trim(), `${EL}(null, "div", null)`);
+    assert.equal(splice("<div>").trim(), `${EL}(null, "div", null, null)`);
   });
 
   it("rewrites a tag with a block", () => {
     const out = splice("<div> { }");
-    assert.match(out, new RegExp(`${EL}\\(null, "div", null, function\\(\\)\\{`));
+    assert.match(out, new RegExp(`${EL}\\(null, "div", null, null, function\\(\\)\\{`));
   });
 
   it("allows hyphenated custom elements", () => {
-    assert.equal(splice("<my-widget>").trim(), `${EL}(null, "my-widget", null)`);
+    assert.equal(splice("<my-widget>").trim(), `${EL}(null, "my-widget", null, null)`);
   });
 
   it("rewrites namespaced tags", () => {
     assert.equal(
       splice("<svg:linear-gradient>").trim(),
-      `${EL}("svg", "linear-gradient", null)`,
+      `${EL}("svg", "linear-gradient", null, null)`,
     );
   });
 
@@ -63,6 +63,21 @@ describe("splice: <tag>", () => {
       },
     }).code;
     assert.match(out, /React\.createElement\(MyButton\)/);
+  });
+
+  it("accepts separate target and result type witnesses", () => {
+    const out = spliceWithMap(`<react:MyButton>`, {
+      typeWitness() {
+        return {
+          target: `new ElementBuilder(MyButton)`,
+          result: `React.createElement(MyButton)`,
+        };
+      },
+    }).code;
+    assert.match(
+      out,
+      /new ElementBuilder\(MyButton\), React\.createElement\(MyButton\)/,
+    );
   });
 });
 

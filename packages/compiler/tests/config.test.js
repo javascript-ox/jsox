@@ -44,7 +44,18 @@ describe("loadConfig", () => {
     );
     assert.throws(
       () => normalizeConfig({ namespaceHandlers: { view: "makeView" } }),
-      /config\.namespaceHandlers\.view must be a function/,
+      /config\.namespaceHandlers\.view must be a function or an object/,
+    );
+    assert.throws(
+      () => normalizeConfig({ namespaceHandlers: { view: {} } }),
+      /object with create\(\)/,
+    );
+    assert.throws(
+      () =>
+        normalizeConfig({
+          namespaceHandlers: { view: { create: () => "makeView()", finalize: true } },
+        }),
+      /optional finalize\(\)/,
     );
     assert.throws(
       () => normalizeConfig({ defaultNamespace: "view" }),

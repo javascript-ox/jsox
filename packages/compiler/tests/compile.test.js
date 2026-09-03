@@ -217,6 +217,21 @@ describe("compile: config", () => {
       /config\.namespaceHandlers\["view"\]\(\) must return a JavaScript expression string/,
     );
   });
+
+  it("requires namespace finalizers to return JavaScript expression strings", () => {
+    assert.throws(
+      () =>
+        js(`<view:card>`, {
+          namespaceHandlers: {
+            view: {
+              create: () => `makeView()`,
+              finalize: () => ({}),
+            },
+          },
+        }),
+      /config\.namespaceHandlers\["view"\]\.finalize\(\) must return a JavaScript expression string/,
+    );
+  });
 });
 
 describe("compile: arrays vs captures", () => {

@@ -88,6 +88,41 @@ const element = <MyReactElement> {
     assert.match(text, /MyReactElement/);
   });
 
+  it("types the block as the creation target and the selector as the finalized result", () => {
+    const js = createJsService({
+      defaultNamespace: "react",
+      namespaceHandlers: {
+        react: {
+          create: (tag) => `new ElementBuilder(${tag})`,
+          finalize: (target) => `finish(${target})`,
+        },
+      },
+    });
+    const file = "/tmp/finalized-react-element.jsox";
+    const source = `class MyButton {}
+class ElementBuilder {
+  constructor(type) { this.type = type; }
+  variant = "";
+}
+class ReactElement {
+  mount() {}
+}
+/** @param {ElementBuilder} builder @returns {ReactElement} */
+function finish(builder) { return new ReactElement(); }
+const element = <MyButton> {
+  .variant = "primary"
+};
+element.mount();`;
+    js.upsert(file, source);
+    assert.deepEqual(js.diagnostics(file), []);
+    const info = js.quickInfo(
+      file,
+      js.origOffsetToGen(js.get(file), source.indexOf("element =")),
+    );
+    const text = info ? info.displayParts.map((part) => part.text).join("") : "";
+    assert.match(text, /ReactElement/);
+  });
+
   it("completes this-shorthand as element properties", () => {
     const js = createJsService();
     const file = "/tmp/props.jsox";

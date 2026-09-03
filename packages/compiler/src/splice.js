@@ -146,8 +146,13 @@ function tryTag(tokens, i, opts) {
   j++;
   const namespaceArg = namespace === null ? "null" : JSON.stringify(namespace);
   const witness = opts?.typeWitness?.(namespace, name);
-  const witnessArg = typeof witness === "string" ? witness : "null";
-  const args = `${namespaceArg}, ${JSON.stringify(name)}, ${witnessArg}`;
+  const targetWitness =
+    typeof witness === "string" ? witness : witness?.target;
+  const resultWitness =
+    typeof witness === "string" ? witness : witness?.result;
+  const targetArg = typeof targetWitness === "string" ? targetWitness : "null";
+  const resultArg = typeof resultWitness === "string" ? resultWitness : targetArg;
+  const args = `${namespaceArg}, ${JSON.stringify(name)}, ${targetArg}, ${resultArg}`;
   const k = skipWs(tokens, j);
   if (tokens[k]?.value === "{") {
     const block = takeBalanced(tokens, k, "{", "}", opts?.recover);

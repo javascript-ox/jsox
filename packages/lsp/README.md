@@ -26,12 +26,12 @@ an `SVGCircleElement`, while unqualified tags and `<html:button>` retain their
 HTML element types. The server loads `jsox.config.js` from the workspace root,
 so `defaultNamespace` and custom namespace names match the compiler.
 
-For a custom namespace, the factory's creation expression is added to the
-virtual TypeScript program as a type witness. TypeScript therefore infers the
-real result without a separate type registry. For example, a factory that
-returns `new MyReactElement()` makes `<MyReactElement> {}` use
-`MyReactElement` for hover, completion, diagnostics, and `this` inside the
-block.
+For a custom namespace, the handler's generated expressions are added to the
+virtual TypeScript program as type witnesses. TypeScript therefore infers the
+real types without a separate type registry. A function handler uses its
+creation type both inside and outside the block. For an object handler with
+`create` and `finalize`, `create` types `this` and block completions while
+`finalize` types the completed selector value.
 
 Base syntax coloring stays with the editor. The server adds semantic
 classifications for constructs such as namespace scopes, functions, and

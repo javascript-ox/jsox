@@ -30,7 +30,7 @@ export function normalizeConfig(input = {}) {
     typeof suppliedNamespaces !== "object" ||
     Array.isArray(suppliedNamespaces)
   ) {
-    throw new TypeError("config.namespaceHandlers must be an object of functions");
+    throw new TypeError("config.namespaceHandlers must be an object of namespace handlers");
   }
   const namespaceHandlers = {
     ...defaultConfig.namespaceHandlers,
@@ -40,8 +40,16 @@ export function normalizeConfig(input = {}) {
     if (!NAMESPACE_NAME.test(namespace)) {
       throw new TypeError(`Invalid tag namespace ${JSON.stringify(namespace)}`);
     }
-    if (typeof factory !== "function") {
-      throw new TypeError(`config.namespaceHandlers.${namespace} must be a function`);
+    const validObject =
+      factory !== null &&
+      typeof factory === "object" &&
+      !Array.isArray(factory) &&
+      typeof factory.create === "function" &&
+      (factory.finalize === undefined || typeof factory.finalize === "function");
+    if (typeof factory !== "function" && !validObject) {
+      throw new TypeError(
+        `config.namespaceHandlers.${namespace} must be a function or an object with create() and optional finalize() functions`,
+      );
     }
     namespaceHandlers[namespace] = factory;
   }

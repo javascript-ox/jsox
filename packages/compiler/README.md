@@ -48,7 +48,8 @@ const { code } = compile(source);
 Optional `jsox.config.js` in the project root can override:
 
 - `create(tag)`, which returns the JavaScript expression used to create a tag
-- `namespaceHandlers`, an object mapping `<>` namespaces to factory functions
+- `namespaceHandlers`, an object mapping `<>` namespaces to factory functions or
+  `{ create, finalize }` handlers
 - `defaultNamespace` (`html` by default), used for tags without a namespace
 - `childMethods` (`append`, `push`, `add` by default)
 - `childHelperName` (`$child` by default; must be a valid JavaScript identifier); the compiler adds a numeric suffix if that name is already bound in the source
@@ -84,6 +85,39 @@ export default {
 };
 ```
 
+Factories that need a mutable construction phase and a different final value
+can use the object form. `create` constructs the target used as `this` inside
+the JSOX block. After that block has run, `finalize` receives the generated
+target expression and returns an expression for the selector's final value:
+
+```js
+export default {
+  namespaceHandlers: {
+    react: {
+      create(tag) {
+        return `new ReactElementBuilder(${tag})`;
+      },
+      finalize(target) {
+        return `${target}.build()`;
+      },
+    },
+  },
+};
+```
+
+```js
+const button = <react:Button> {
+  .variant = "primary"
+  ["Save"]
+}
+```
+
+Finalization is automatic, including for nested selectors: a child is
+finalized before it is inserted into its parent. Both callbacks run at compile
+time and must return JavaScript expression strings. `finalize` also receives a
+second context argument containing `tag`, `namespace`, `explicitNamespace`,
+and `qualifiedName`.
+
 With that configuration, `<card>` and `<view:card>` both use the `view`
 factory. `<html:button>` and `<svg:circle>` can still select the built-in
 factories explicitly.
@@ -92,6 +126,8 @@ The existing `create(tag)` option remains supported and configures the built-in
 `html` handler for backward compatibility.
 
 The language server loads the same configuration and uses a namespace
-factory's returned expression for TypeScript inference. Adding namespaces does
-not change unqualified HTML typing unless `defaultNamespace` is explicitly set
-to another namespace.
+factory's returned expressions for TypeScript inference. With a finalizer, the
+creation expression types `this` inside the block while the finalization
+expression types the selector result. Adding namespaces does not change
+unqualified HTML typing unless `defaultNamespace` is explicitly set to another
+namespace.
