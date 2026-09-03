@@ -171,6 +171,71 @@ export function createJsService(configInput = {}) {
     return service.getDefinitionAtPosition(tsName(fileName), genOffset);
   }
 
+  function tagDefinition(fileName, origOffset) {
+    const name = tsName(fileName);
+    const entry = docs.get(name);
+    if (!entry || entry.error) return undefined;
+    const tagPattern = /<(?:(?:[A-Za-z][\w-]*):)?([A-Za-z][\w-]*)>/g;
+    let tagMatch;
+    for (const match of entry.source.matchAll(tagPattern)) {
+      const tagStart = match.index + match[0].lastIndexOf(match[1]);
+      if (origOffset >= tagStart && origOffset <= tagStart + match[1].length) {
+        tagMatch = match;
+        break;
+      }
+    }
+    if (!tagMatch) return undefined;
+
+    const candidates = entry.maps.filter((map) => {
+      if (tagMatch.index < map.origStart || tagMatch.index >= map.origEnd) return false;
+      const generated = entry.code.slice(
+        entry.preamble + map.genStart,
+        entry.preamble + map.genStart + 16,
+      );
+      return /^;?__jsox_el\(/.test(generated);
+    });
+    const map = candidates.sort(
+      (a, b) => (a.origEnd - a.origStart) - (b.origEnd - b.origStart),
+    )[0];
+    if (!map) return undefined;
+
+    const sourceFile = service.getProgram()?.getSourceFile(name);
+    if (!sourceFile) return undefined;
+    const generatedStart = entry.preamble + map.genStart;
+    let call;
+    function visit(node) {
+      if (call || generatedStart < node.getFullStart() || generatedStart >= node.end) return;
+      if (
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === "__jsox_el"
+      ) {
+        call = node;
+        return;
+      }
+      ts.forEachChild(node, visit);
+    }
+    visit(sourceFile);
+    if (!call) return undefined;
+
+    const type = service.getProgram().getTypeChecker().getTypeAtLocation(call);
+    const symbol = type.aliasSymbol ?? type.getSymbol();
+    if (!symbol?.declarations?.length) return undefined;
+    return symbol.declarations.map((declaration) => {
+      const declarationName = declaration.name;
+      const start = declarationName?.getStart() ?? declaration.getStart();
+      const length = declarationName?.getWidth() ?? Math.max(1, declaration.getWidth());
+      return {
+        fileName: declaration.getSourceFile().fileName,
+        textSpan: { start, length },
+        kind: ts.ScriptElementKind.interfaceElement,
+        name: symbol.getName(),
+        containerKind: undefined,
+        containerName: "",
+      };
+    });
+  }
+
   function definitionToOriginal(def) {
     const physical = physicalJsoxName(def.fileName);
     if (!physical) return def;
@@ -215,6 +280,12 @@ export function createJsService(configInput = {}) {
       const start = genOffsetToOrig(entry, genStart);
       const end = genOffsetToOrig(entry, genStart + genLength);
       if (end <= start || end > entry.source.length) continue;
+      if (
+        entry.source.slice(start, end) !==
+        entry.code.slice(genStart, genStart + genLength)
+      ) {
+        continue;
+      }
       tokens.push({
         start,
         end,
@@ -279,6 +350,7 @@ export function createJsService(configInput = {}) {
     completions,
     quickInfo,
     definition,
+    tagDefinition,
     definitionToOriginal,
     signatures,
     semanticTokens,
