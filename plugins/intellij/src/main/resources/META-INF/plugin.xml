@@ -21,6 +21,7 @@
     <fileTypeOverrider implementation="dev.jsox.intellij.JsoxFileTypeOverrider" order="last"/>
     <lang.parserDefinition language="JSOX" implementationClass="dev.jsox.intellij.JsoxParserDefinition"/>
     <lang.syntaxHighlighterFactory language="JSOX" implementationClass="dev.jsox.intellij.JsoxSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="dev.jsox.intellij.JsoxColorSettingsPage"/>
     <lang.commenter language="JSOX" implementationClass="dev.jsox.intellij.JsoxCommenter"/>
     <notificationGroup id="JSOX" displayType="BALLOON"/>
     <applicationConfigurable

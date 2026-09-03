@@ -106,7 +106,7 @@ describe("jsox-lsp protocol", () => {
         clientInfo: { name: "jsox-lsp-test" },
       });
       assert.equal(init.serverInfo?.name, "JSOX");
-      assert.equal(init.serverInfo?.version, "0.2.0");
+      assert.equal(init.serverInfo?.version, "0.2.1");
       assert.equal(init.capabilities.hoverProvider, true);
       assert.equal(init.capabilities.completionProvider.triggerCharacters.includes("."), true);
       assert.deepEqual(init.capabilities.semanticTokensProvider.full, { delta: false });
@@ -146,6 +146,13 @@ describe("jsox-lsp protocol", () => {
         textDocument: { uri },
       });
       assert.ok(semantic.data.length > 0);
+
+      const definitions = await server.request("textDocument/definition", {
+        textDocument: { uri },
+        position: { line: 1, character: 15 },
+      });
+      assert.ok(definitions.length);
+      assert.match(definitions[0].uri, /lib\.dom\.d\.ts$/);
     } finally {
       await server.shutdown();
     }

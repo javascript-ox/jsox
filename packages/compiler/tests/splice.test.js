@@ -156,4 +156,11 @@ describe("spliceWithMap", () => {
     assert.equal(spliceWithMap(src).code.includes("this."), false);
     assert.equal(spliceWithMap(src, { incompleteThis: true }).code.includes("this."), true);
   });
+
+  it("maps a cursor at the end of an incomplete shorthand", () => {
+    const source = `<h> {\n  .`;
+    const result = spliceWithMap(source, { incompleteThis: true, recover: true });
+    const generated = origToGen(result.maps, source.length);
+    assert.equal(result.code.slice(generated - 5, generated), "this.");
+  });
 });

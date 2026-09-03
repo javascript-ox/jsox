@@ -4,6 +4,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 import { createJsoxSession } from "../src/features.js";
 
 describe("jsox session", () => {
@@ -33,7 +34,7 @@ describe("jsox session", () => {
     session.upsert(file, source);
     const items = session.completions(file, source.lastIndexOf(".") + 1, source);
     const labels = new Set(items.map((i) => i.label));
-    assert.ok(labels.has("className") || labels.has("addEventListener"));
+    assert.ok(labels.has("className"));
   });
 
   it("finds a same-file definition", () => {
@@ -51,6 +52,21 @@ describe("jsox session", () => {
     assert.ok(defs.length);
     assert.equal(defs[0].sameFile, true);
     assert.ok(defs[0].origStart <= source.indexOf("el"));
+  });
+
+  it("navigates from an HTML tag to its DOM element type", () => {
+    const session = createJsoxSession();
+    const file = "/tmp/features-tag-definition.jsox";
+    const source = `const el = <div> { .className = "card" };`;
+    session.upsert(file, source);
+
+    const defs = session.definition(file, source.indexOf("div") + 1);
+    assert.ok(defs.length);
+    assert.equal(defs[0].sameFile, false);
+    assert.match(defs[0].fileName, /lib\.dom\.d\.ts$/);
+    const domSource = ts.sys.readFile(defs[0].fileName);
+    const line = domSource.split("\n")[defs[0].start.line];
+    assert.match(line.slice(defs[0].start.character), /^HTMLDivElement/);
   });
 
   it("resolves and navigates to an unopened jsox import", async (t) => {
@@ -94,6 +110,10 @@ describe("jsox session", () => {
     assert.ok(classified.some((token) => token.text === "clockEl" && token.type === 7));
     assert.ok(classified.some((token) => token.text === "className" && token.type === 9));
     assert.ok(classified.some((token) => token.text === "dateTime" && token.type === 9));
+    assert.equal(
+      classified.some((token) => /\s|[{}]/.test(token.text)),
+      false,
+    );
   });
 
   it("classifies a scoped-tag namespace separately", () => {
